@@ -37,13 +37,63 @@ set(PI_HEADER_DIR include/OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR)
 set(PI_SOURCE_DIR source/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR)
 
 
-# header needs to be defined here, because it needs to be MOC'd
-set(PeakInvestigatorHeaders ${PI_HEADER_DIR}/PeakInvestigator.h)
-set(PeakInvestigatorSources ${PI_SOURCE_DIR}/PeakInvestigator.cpp)
+set(PI_HEADERS
+    PeakInvestigator.h
+    DIALOGS/AbstractDialogFactory.h
+    DIALOGS/ConsoleDialogFactory.h
+    DIALOGS/AbstractInitDialog.h
+    DIALOGS/ConsoleInitDialog.h
+    DIALOGS/AbstractVersionDialog.h
+    DIALOGS/ConsoleVersionDialog.h
+)
 
+set(PI_SOURCES
+    PeakInvestigator.cpp
+    DIALOGS/ConsoleDialogFactory.cpp
+    DIALOGS/ConsoleInitDialog.cpp
+    DIALOGS/ConsoleVersionDialog.cpp
+)
+
+#if(WITH_GUI)
+#    list(APPEND PI_HEADERS
+#        DIALOGS/GUIDialogFactory.h
+#        DIALOGS/GUIVersionDialog.h
+#        DIALOGS/GUIInitDialog.h
+#        )
+#endif()
+
+set(PeakInvestigatorHeaders)
+foreach(I ${PI_HEADERS})
+    list(APPEND PeakInvestigatorHeaders ${PI_HEADER_DIR}/${I})
+endforeach()
+
+set(PeakInvestigatorSources)
+foreach(I ${PI_SOURCES})
+    list(APPEND PeakInvestigatorSources ${PI_SOURCE_DIR}/${I})
+endforeach()
+
+# combine list of files for building library
 set(PeakInvestigatorFiles)
 list(APPEND PeakInvestigatorFiles ${PeakInvestigatorHeaders})
 list(APPEND PeakInvestigatorFiles ${PeakInvestigatorSources})
 
-source_group("Source Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR" FILES ${PeakInvestigatorSources})
-source_group("Header Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR" FILES ${PeakInvestigatorHeaders})
+# setup header groups for IDEs
+set(PI_DIALOG_HEADERS ${PeakInvestigatorHeaders})
+list(REMOVE_ITEM PI_DIALOG_HEADERS ${PI_HEADER_DIR}/PeakInvestigator.h)
+source_group("Header Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR"
+    FILES ${PI_HEADER_DIR}/PeakInvestigator.h
+)
+source_group("Header Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR\\DIALOGS"
+    FILES ${PI_DIALOG_HEADERS}
+)
+
+# setup source groups for IDEs
+set(PI_DIALOG_SOURCES ${PeakInvestigatorSources})
+list(REMOVE_ITEM PI_DIALOG_SOURCES ${PI_HEADER_DIR}/PeakInvestigator.cpp)
+source_group("Source Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR"
+    FILES ${PI_SOURCE_DIR}/PeakInvestigator.cpp
+)
+source_group("Source Files\\TRANSFORMATIONS\\RAW2PEAK\\PEAKINVESTIGATOR\\DIALOGS"
+    FILES ${PI_DIALOG_SOURCES}
+)
+
