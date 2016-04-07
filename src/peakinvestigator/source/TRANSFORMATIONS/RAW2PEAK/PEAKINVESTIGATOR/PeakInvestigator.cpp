@@ -28,67 +28,38 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer:  David Rivkin $
-// $Author: Adam Tenderholt $
+// $Maintainer: Adam Tenderholt $
+// $Author: Adam Tenderholt, David Rivkin $
 // --------------------------------------------------------------------------
 //
 
-#include <fcntl.h> // used for SFTP transfers
-#include <zlib.h> // used for g'zipping tar files
+#include <cmath>
+
+#include <PeakInvestigator/PeakInvestigatorSaaS.h>
+#include <PeakInvestigator/Actions/PiVersionsAction.h>
+#include <PeakInvestigator/Actions/InitAction.h>
 
 #include <OpenMS/FORMAT/PeakTypeEstimator.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PiVersionsAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/InitAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/SftpAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PrepAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/RunAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/StatusAction.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DeleteAction.h>
 
-#ifdef WITH_GUI
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/RtoDialog.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/VersionDialog.h>
-#endif
+//#ifdef WITH_GUI
+//#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/RtoDialog.h>
+//#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/VersionDialog.h>
+//#endif
 
-#include <QtCore/QBuffer>
-#include <QtCore/QCoreApplication>
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtCore/QEventLoop>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
-#include <QtCore/QProcess>
-#include <QtCore/QStringList>
-#include <QtCore/QTextStream>
-#include <QtCore/QtDebug>
-#include <QtCore/QThread>
-#include <QtCore/qglobal.h>
-
-// JSON support
-#include <qjson/parser.h>
-
-#define VI_API_SUFFIX "/api/"
-#define VI_SSH_HASH String("D2:BE:B8:2E:3C:BE:84:E4:A3:0A:C8:42:5C:6B:39:4E")
-#define minutesCheckPrep 2
-#define minutesTimeoutPrep 20
-
-using namespace std;
+using namespace Veritomyx::PeakInvestigator;
 
 namespace OpenMS
 {
-  PeakInvestigator::PeakInvestigator(QObject* parent) :
-    QObject(parent),
+  PeakInvestigator::PeakInvestigator() :
     DefaultParamHandler("PeakInvestigator"),
-    ProgressLogger(),
-    manager_(this)
+    ProgressLogger()
   {
     // set default parameter values
     defaults_.setValue("server", "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
     defaults_.setValue("username", "USERNAME", "Username for account registered with Veritomyx");
     defaults_.setValue("password", "PASSWORD", "Password for account registered with Veritomyx");
-    defaults_.setValue("account", 12345, "Account number");
+    defaults_.setValue("project", 12345, "The project number used for the PeakInvestigator job");
 
     defaults_.setValue("m/z", "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
 
@@ -99,151 +70,35 @@ namespace OpenMS
     defaultsToParam_();
     updateMembers_();
 
+    service_ = new PeakInvestigatorSaaS(server_);
+
   }
 
   PeakInvestigator::~PeakInvestigator()
   {
+    delete service_;
   }
 
   void PeakInvestigator::run()
   {
 
     // filenames for the tar'd scans/results
-    QString zipfilename;
+    String zipfilename;
     String localFilename;
     String remoteFilename;
 
     switch(mode_)
     {
-
     case SUBMIT:
-      if (!PIVersionsJob_())
-      {
-        break;
-      }
-#ifdef WITH_GUI
-      if(!getVersionDlg())
-      {
-        break;
-      }
-#endif
-      if (!initializeJob_())
-      {
-        break;
-      }
-#ifdef WITH_GUI
-      if(!getRTODlg())
-      {
-        break;
-      }
-#endif
-
-      if(getSFTPCredentials_())
-      {
-
-        // Generate local and remote filenames of tar'd scans
-        zipfilename = job_ + ".scans.tar";
-        localFilename = QDir::tempPath() + "/" + zipfilename;
-        remoteFilename = sftp_dir_ + "/" + zipfilename;
-        tar.store(localFilename, experiment_);
-
-        // Remove data values from scans in exp now that they have been bundled
-        for (Size i = 0; i < experiment_.size(); i++)
-        {
-          experiment_[i].clear(false);
-        }
-
-        // Set SFTP host paramters and upload file
-        sftp.setHostname(server_);
-        String portnumber(sftp_port_);
-        sftp.setPortnumber(portnumber);
-        sftp.setUsername(sftp_username_);
-        sftp.setPassword(sftp_password_);
-        sftp.setExpectedServerHash(VI_SSH_HASH);
-
-        if(sftp.uploadFile(localFilename, remoteFilename))
-        {
-          // Do PREP
-          long timeWait = minutesTimeoutPrep;
-          PeakInvestigator::PIStatus prep_stat = getPrepFileMessage_(zipfilename);
-          while((prep_stat == PREP_ANALYZING) && timeWait > 0)
-          {
-            // LOG_INFO << "Waiting for PREP analysis to complete, " << zipfilename.toAscii().constData() << ", on SaaS server...Please be patient.";
-            sleep(minutesCheckPrep * 60);
-            timeWait -= minutesCheckPrep;
-            prep_stat = getPrepFileMessage_(zipfilename);
-          }
-          // TODO:  If we timed out, report and error
-          if(prep_stat == PREP_READY)
-          {
-            sftp_file_ = zipfilename;
-            submitJob_();
-          }
-          else
-          {
-            cout << endl << "Error trying to PREP the file on the Saas server!" << endl;
-          }
-        }
-      }
+      submit_();
       break;
-
     case CHECK:
-      checkJob_();
+      check_();
       break;
-
-    case DELETE:
-      removeJob_();
-      break;
-
     case FETCH:
-
-      if(!getSFTPCredentials_() || !checkJob_()) // Seems we need to check STATUS before file is moved to SFTP drop after completion
-      {
-        break;
-      }
-
-      // Set SFTP host paramters and upload file
-      sftp.setHostname(sftp_host_);
-      sftp.setPortnumber(sftp_port_);
-      sftp.setUsername(sftp_username_);
-      sftp.setPassword(sftp_password_);
-      sftp.setExpectedServerHash(VI_SSH_HASH);
-
-      // Generate local and remote filenames of tar'd scans
-      sftp_file_ = zipfilename = QFileInfo(results_file_).fileName();
-      localFilename = QDir::tempPath() + "/" + zipfilename;
-      remoteFilename = results_file_;
-
-      if (!sftp.downloadFile(remoteFilename, localFilename))
-      {
-        break;
-      }
-
-      tar.load(localFilename, experiment_);
-
-      // Set-up data processing meta data to add to each scan
-      boost::shared_ptr<DataProcessing> dp(new DataProcessing());
-      std::set<DataProcessing::ProcessingAction> actions;
-      actions.insert(DataProcessing::PEAK_PICKING);
-      dp->setProcessingActions(actions);
-      dp->getSoftware().setName("PeakInvestigator");
-      dp->setCompletionTime(DateTime::now());
-      dp->setMetaValue("parameter: peakinvestigator:server", server_);
-      dp->setMetaValue("peakinvestigator:job", job_);
-
-      // Now add meta data to the scans
-      for (Size i = 0; i < experiment_.size(); i++)
-      {
-        experiment_[i].getDataProcessing().push_back(dp);
-        experiment_[i].setType(SpectrumSettings::PEAKS);
-      }
-
-      removeJob_();
+      fetch_();
       break;
-
-    } //end switch
-
-    shutdown();
+    }
 
   }
 
@@ -266,6 +121,85 @@ namespace OpenMS
     return true;
   }
 
+  void PeakInvestigator::submit_()
+  {
+    String version = getVersion_();
+
+    JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
+    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
+
+    String response = service_->executeAction(&action);
+    action.processResponse(response);
+
+    EstimatedCosts costs = action.getEstimatedCosts();
+    double funds = action.getFunds();
+    if(funds < costs.getMaximumCost(RTO_))
+    {
+      LOG_ERROR << "Insufficient funds: $" << std::fixed << std::setprecision(2) << funds << ".\n";
+      LOG_ERROR.unsetf(std::ios::floatfield);
+      return;
+    }
+  }
+
+  void PeakInvestigator::check_()
+  {
+
+  }
+
+  void PeakInvestigator::fetch_()
+  {
+
+  }
+
+  String PeakInvestigator::getVersion_()
+  {
+    PiVersionsAction action(username_, password_);
+    String response = service_->executeAction(&action);
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw std::runtime_error(action.getErrorMessage());
+    }
+
+    if(PIVersion_.toLower() == "lastused")
+    {
+      return action.getLastUsedVersion();
+    }
+    else if (PIVersion_.toLower() == "current")
+    {
+      return action.getCurrentVersion();
+    }
+    else if (PIVersion_.toLower() == "select")
+    {
+      // handle selection
+      return "selected";
+    }
+
+    throw std::runtime_error("Invalid version specification.");
+
+  }
+
+  JobAttributes PeakInvestigator::getJobAttributes(MSExperiment<Peak1D>& experiment)
+  {
+    int minMass = INT_MAX, maxMass = 0, maxPoints = 0;
+    for(Size s = 0; s < experiment.size(); s++)
+    {
+      experiment[s].sortByPosition();
+      minMass = std::min(minMass, static_cast<int>(std::floor(experiment[s].getMin()[0])));
+      maxMass = std::max(maxMass, static_cast<int>(std::ceil(experiment[s].getMax()[0])));
+      maxPoints = std::max(maxPoints, static_cast<int>(experiment[s].size()));
+    }
+
+    JobAttributes attributes;
+    attributes.min_mass = minMass;
+    attributes.max_mass = maxMass;
+    attributes.max_points = maxPoints;
+
+    return attributes;
+  }
+
+  /*
   bool PeakInvestigator::PIVersionsJob_()
   {
     LOG_DEBUG << "Requsting credentials for " + username_ + "..." << endl;
@@ -503,13 +437,15 @@ namespace OpenMS
       return PREP_ERROR;
     }
   }
+*/
 
   void PeakInvestigator::updateMembers_()
   {
     server_ = param_.getValue("server");
     username_ = param_.getValue("username");
     password_ = param_.getValue("password");
-    account_number_ = param_.getValue("account");
+    projectID_ = param_.getValue("project");
+
     String  minMaxString = param_.getValue("m/z");
     std::vector<String> minMaxSplit;
     if((minMaxString != "[min]:[max]") && minMaxString.split(':', minMaxSplit))
@@ -517,47 +453,14 @@ namespace OpenMS
       min_mass_ = minMaxSplit[0].toInt();
       max_mass_ = minMaxSplit[1].toInt();
     }
-    RTO_ = param_.getValue("RTO").toQString();
-    PIVersion_ = param_.getValue("Version").toQString();
+
+    RTO_ = param_.getValue("RTO");
+    PIVersion_ = param_.getValue("Version");
+
     DefaultParamHandler::updateMembers_();
   }
 
-  QString PeakInvestigator::Post_(QString params, bool &success)
-  {
-    if(params.isEmpty())
-    {
-      success = false;
-      return "";
-    }
-
-    url_.setUrl("https://" + server_.toQString() + VI_API_SUFFIX);
-
-    QNetworkRequest request(url_);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    request.setHeader(QNetworkRequest::ContentLengthHeader, QString::number(params.size()));
-
-    reply_ = manager_.post(request, params.toUtf8());
-
-    QEventLoop loop;
-    QObject::connect(reply_, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
-
-    if (reply_->error() != QNetworkReply::NoError)
-    {
-      LOG_ERROR << "There was an error making a network request:\n";
-      LOG_ERROR << reply_->errorString().toAscii().constData() << endl;
-      reply_->deleteLater();
-      success = false;
-      return "";
-    }
-
-    QString contents(reply_->readAll());
-
-    reply_->deleteLater();
-    success = true;
-    return contents;
-  }
-
+  /*
 #ifdef WITH_GUI
   bool PeakInvestigator::getVersionDlg(void)
   {
@@ -612,5 +515,5 @@ namespace OpenMS
   }
 
 #endif // WITH_GUI
-
+*/
 }
