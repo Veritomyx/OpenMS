@@ -45,6 +45,7 @@ set(PI_HEADERS
     DIALOGS/ConsoleInitDialog.h
     DIALOGS/AbstractVersionDialog.h
     DIALOGS/ConsoleVersionDialog.h
+    DIALOGS/ConsoleDialogSelector.h
 )
 
 set(PI_SOURCES
@@ -52,6 +53,7 @@ set(PI_SOURCES
     DIALOGS/ConsoleDialogFactory.cpp
     DIALOGS/ConsoleInitDialog.cpp
     DIALOGS/ConsoleVersionDialog.cpp
+    DIALOGS/ConsoleDialogSelector.cpp
 )
 
 #if(WITH_GUI)
