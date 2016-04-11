@@ -32,14 +32,50 @@
 // $Author: Adam Tenderholt $
 // --------------------------------------------------------------------------
 
+#include <stdexcept>
+#include <sstream>
+
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogSelector.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
+
+#define INPUT *input_
+#define OUTPUT *output_
+
+struct Entry
+{
+    std::string value;
+};
+
+std::istream& operator>>(std::istream& is, Entry& entry)
+{
+  std::istream::sentry s(is);
+  if (s) while (is.good())
+  {
+    char c = is.get();
+    if (std::isdigit(c, is.getloc()))
+    {
+      entry.value += c;
+    }
+    else if (std::iscntrl(c, is.getloc()) || c < 0) // seems to be terminating char for streams (testing)
+    {
+      break;
+    }
+    else
+    {
+      throw std::invalid_argument("Only digits are allowed.");
+    }
+  }
+
+  return is;
+}
 
 namespace OpenMS
 {
-  ConsoleVersionDialog::ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream *input)
+  ConsoleVersionDialog::ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream *input, std::ostream *output)
     : AbstractVersionDialog(title, versions, current, previous)
   {
     input_ = input;
+    output_ = output;
   }
 
   ConsoleVersionDialog::~ConsoleVersionDialog()
@@ -49,6 +85,81 @@ namespace OpenMS
 
   bool ConsoleVersionDialog::exec()
   {
+    OUTPUT << "\n\nThe following versions of PeakInvestigator are available:\n\n";
 
+    while(true)
+    {
+      printMenu();
+
+      unsigned int index;
+      try
+      {
+        index = ConsoleDialogSelector::select(INPUT);
+      }
+      catch(...)
+      {
+        input_->ignore(std::numeric_limits<std::streamsize>::max()); // go to end of stream;
+        OUTPUT << "\nInvalid entry. Please select from the following versions of PeakInvestigator:\n\n";
+        continue;
+      }
+
+      if (index == 0) // Cancel
+      {
+        return false;
+      }
+      else if (index <= versions_.size())
+      {
+        selectVersion_(index);
+        return true;
+      }
+      else
+      {
+        OUTPUT << "\nInvalid number. Please select from the following versions of PeakInvestigator:\n\n";
+      }
+    }
+  }
+
+  void ConsoleVersionDialog::printMenu()
+  {
+    std::list<String>::const_iterator iter;
+    unsigned int i;
+    for(i = 0, iter = versions_.begin(); iter != versions_.end(); ++i, ++iter)
+    {
+      String version = *iter;
+      if (version == current_ && version == previous_)
+      {
+        version.append(" (current and last used)");
+      }
+      else if (version == current_)
+      {
+        version.append(" (current)");
+      }
+      else if (version == previous_)
+      {
+        version.append(" (last used)");
+      }
+
+      String line = formatLine(i + 1, version);
+      OUTPUT << line;
+    }
+
+    OUTPUT << "\nPlease enter your choice (0 to cancel): ";
+  }
+
+  String ConsoleVersionDialog::formatLine(int i, String version)
+  {
+    std::ostringstream stream;
+    stream << "\t(" << i << ") " << version << "\n";
+    return stream.str();
+  }
+
+  void ConsoleVersionDialog::selectVersion_(unsigned int index)
+  {
+    std::list<String>::const_iterator iter = versions_.begin();
+    for(unsigned int i = 0; i < index; i++)
+    {
+      selectedVersion_ = *iter;
+      ++iter;
+    }
   }
 }
