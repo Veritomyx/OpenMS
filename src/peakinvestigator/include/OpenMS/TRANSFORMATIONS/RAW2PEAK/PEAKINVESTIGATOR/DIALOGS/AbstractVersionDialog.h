@@ -37,11 +37,12 @@
 
 #include <list>
 
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
 #include <OpenMS/DATASTRUCTURES/String.h>
 
 namespace OpenMS
 {
-  class AbstractVersionDialog
+  class PEAKINVESTIGATOR_DLLAPI AbstractVersionDialog
   {
     public:
       AbstractVersionDialog(String title, std::list<String> versions, String current, String previous)

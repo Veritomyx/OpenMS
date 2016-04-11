@@ -35,13 +35,15 @@
 #ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEINITDIALOG_H
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEINITDIALOG_H
 
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
+
 #include "AbstractInitDialog.h"
 
 using Veritomyx::PeakInvestigator::EstimatedCosts;
 
 namespace OpenMS
 {
-  class ConsoleInitDialog : public AbstractInitDialog
+  class PEAKINVESTIGATOR_DLLAPI ConsoleInitDialog : public AbstractInitDialog
   {
     public:
 
