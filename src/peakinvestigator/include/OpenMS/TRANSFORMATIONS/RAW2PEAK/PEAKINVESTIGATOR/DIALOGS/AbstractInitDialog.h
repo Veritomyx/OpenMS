@@ -37,13 +37,15 @@
 
 #include <PeakInvestigator/Actions/InitAction.h>
 
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
+
 #include <OpenMS/DATASTRUCTURES/String.h>
 
 using Veritomyx::PeakInvestigator::EstimatedCosts;
 
 namespace OpenMS
 {
-  class AbstractInitDialog
+  class PEAKINVESTIGATOR_DLLAPI AbstractInitDialog
   {
     public:
 

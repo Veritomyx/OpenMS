@@ -36,6 +36,8 @@
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_ABSTRACTDIALOGFACTORY_H
 
 #include <PeakInvestigator/Actions/InitAction.h>
+
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
 #include <OpenMS/DATASTRUCTURES/String.h>
 
 using Veritomyx::PeakInvestigator::EstimatedCosts;
@@ -45,7 +47,7 @@ namespace OpenMS
   class AbstractInitDialog;
   class AbstractVersionDialog;
 
-  class AbstractDialogFactory
+  class PEAKINVESTIGATOR_DLLAPI AbstractDialogFactory
   {
     public:
 
