@@ -1,0 +1,14 @@
+
+
+The following versions of PeakInvestigator are available:
+
+	(1) 1.2 (current)
+	(2) 1.0
+
+Please enter your choice (0 to cancel): 
+Invalid entry. Please select from the following versions of PeakInvestigator:
+
+	(1) 1.2 (current)
+	(2) 1.0
+
+Please enter your choice (0 to cancel): 
