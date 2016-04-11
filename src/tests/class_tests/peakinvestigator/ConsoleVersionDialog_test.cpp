@@ -35,11 +35,14 @@
 
 #include <list>
 #include <sstream>
+#include <fstream>
 
 #include <OpenMS/DATASTRUCTURES/String.h>
 #include <OpenMS/CONCEPT/ClassTest.h>
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
+
+#include "PeakInvestigator_test_config.h"
 
 using namespace OpenMS;
 
@@ -61,6 +64,13 @@ START_SECTION(exec() cancel)
   ConsoleVersionDialog dialog("Foobar", versions, "1.2", "", &istream, &ostream);
   bool retval = dialog.exec();
   TEST_EQUAL(retval, false);
+
+  std::fstream file(GET_TEST_DATA_PATH("ConsoleVersionDialog_output_ok.txt"));
+  std::stringstream contents;
+  contents << file.rdbuf();
+  file.close();
+
+  TEST_STRING_EQUAL(ostream.str(), contents.str());
 END_SECTION
 
 START_SECTION(exec() select first)
@@ -73,8 +83,16 @@ START_SECTION(exec() select first)
 
   ConsoleVersionDialog dialog("Foobar", versions, "1.2", "", &istream, &ostream);
   bool retval = dialog.exec();
+
   TEST_EQUAL(retval, true);
   TEST_STRING_EQUAL(dialog.getSelectedVersion(), "1.2");
+
+  std::fstream file(GET_TEST_DATA_PATH("ConsoleVersionDialog_output_ok.txt"));
+  std::stringstream contents;
+  contents << file.rdbuf();
+  file.close();
+
+  TEST_STRING_EQUAL(ostream.str(), contents.str());
 END_SECTION
 
 START_SECTION(exec() select second)
@@ -89,6 +107,13 @@ START_SECTION(exec() select second)
   bool retval = dialog.exec();
   TEST_EQUAL(retval, true);
   TEST_STRING_EQUAL(dialog.getSelectedVersion(), "1.0");
+
+  std::fstream file(GET_TEST_DATA_PATH("ConsoleVersionDialog_output_ok.txt"));
+  std::stringstream contents;
+  contents << file.rdbuf();
+  file.close();
+
+  TEST_STRING_EQUAL(ostream.str(), contents.str());
 END_SECTION
 
 START_SECTION(exec() select invalid number)
@@ -103,7 +128,12 @@ START_SECTION(exec() select invalid number)
   bool retval = dialog.exec();
   TEST_EQUAL(retval, false);
 
-  std::cout << "Selected: " << dialog.getSelectedVersion() << std::endl;
+  std::fstream file(GET_TEST_DATA_PATH("ConsoleVersionDialog_output_invalid_number.txt"));
+  std::stringstream contents;
+  contents << file.rdbuf();
+  file.close();
+
+  TEST_STRING_EQUAL(ostream.str(), contents.str());
 END_SECTION
 
 START_SECTION(exec() select string)
@@ -118,7 +148,12 @@ START_SECTION(exec() select string)
   bool retval = dialog.exec();
   TEST_EQUAL(retval, false);
 
-  std::cout << "Selected: " << dialog.getSelectedVersion() << std::endl;
+  std::fstream file(GET_TEST_DATA_PATH("ConsoleVersionDialog_output_invalid_entry.txt"));
+  std::stringstream contents;
+  contents << file.rdbuf();
+  file.close();
+
+  TEST_STRING_EQUAL(ostream.str(), contents.str());
 END_SECTION
 
 

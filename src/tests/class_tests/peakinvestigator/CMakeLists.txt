@@ -29,17 +29,24 @@
 #
 # --------------------------------------------------------------------------
 # $Maintainer: David Rivkin $
-# $Authors: David Rivkin $
+# $Authors: David Rivkin, Adam Tenderholt $
 # --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
 project("OpenMS_class_tests_peakinvestigator")
+
+set(PI_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/PeakInvestigator_test_config.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/PeakInvestigator_test_config.h
+)
 
 # --------------------------------------------------------------------------
 # add include directories
 include_directories(SYSTEM ${OpenMS_INCLUDE_DIRECTORIES} 
     ${CMAKE_SOURCE_DIR}/src/peakinvestigator/include
     ${CMAKE_BINARY_DIR}/src/peakinvestigator/include
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # --------------------------------------------------------------------------
