@@ -37,20 +37,27 @@
 
 #include <iostream>
 
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
+
 #include "AbstractVersionDialog.h"
 
 namespace OpenMS
 {
-  class ConsoleVersionDialog : public AbstractVersionDialog
+  class PEAKINVESTIGATOR_DLLAPI ConsoleVersionDialog : public AbstractVersionDialog
   {
     public:
-      ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream* input = &std::cin);
+      ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream* input = &std::cin, std::ostream* output = &std::cout);
       ~ConsoleVersionDialog();
 
       bool exec();
+      void printMenu();
+      static String formatLine(int i, String version);
 
     protected:
+      void selectVersion_(unsigned int index);
+
       std::istream* input_;
+      std::ostream* output_;
   };
 }
 

@@ -2,7 +2,7 @@
 #                   OpenMS -- Open-Source Mass Spectrometry
 # --------------------------------------------------------------------------
 # Copyright The OpenMS Team -- Eberhard Karls University Tuebingen,
-# ETH Zurich, and Freie Universitaet Berlin 2002-2016.
+# ETH Zurich, and Freie Universitaet Berlin 2016.
 #
 # This software is released under a three-clause BSD license:
 #  * Redistributions of source code must retain the above copyright
@@ -28,40 +28,32 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # --------------------------------------------------------------------------
-# $Maintainer: Stephan Aiche $
-# $Authors: Stephan Aiche $
+# $Maintainer: David Rivkin $
+# $Authors: David Rivkin $
 # --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
-project("OpenMS_class_tests")
+project("OpenMS_class_tests_peakinvestigator")
 
-#------------------------------------------------------------------------------
-# set new CMAKE_RUNTIME_OUTPUT_DIRECTORY for tests and remember old setting
-set(_TMP_CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+# --------------------------------------------------------------------------
+# add include directories
+include_directories(SYSTEM ${OpenMS_INCLUDE_DIRECTORIES} 
+    ${CMAKE_SOURCE_DIR}/src/peakinvestigator/include
+    ${CMAKE_BINARY_DIR}/src/peakinvestigator/include
+)
 
-#------------------------------------------------------------------------------
-# add OpenSWATHAlgo specific tests
-add_subdirectory(openswathalgo)
+# --------------------------------------------------------------------------
+# list of available tests
+set(PI_TESTS
+    ConsoleVersionDialog_test
+    ConsoleInitDialog_test
+)
 
-#------------------------------------------------------------------------------
-# add OpenMS specific tests
-add_subdirectory(openms)
+# --------------------------------------------------------------------------
+# add targets for the executables
+foreach(i ${PI_TESTS})
+  add_executable(${i} ${i}.cpp)
+  target_link_libraries(${i} PeakInvestigator OpenMS)
+  add_test(${i} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${i})
+endforeach(i)
 
-#------------------------------------------------------------------------------
-# add OpenMS specific tests
-add_subdirectory(superhirn)
-
-#------------------------------------------------------------------------------
-# add PeakInvestigator specific tests
-add_subdirectory(peakinvestigator)
-
-if(WITH_GUI)
-  #------------------------------------------------------------------------------
-  # add OpenMS_GUI specific tests
-  add_subdirectory(openms_gui)
-endif()
-
-#------------------------------------------------------------------------------
-# restore old CMAKE_RUNTIME_OUTPUT_DIRECTORY
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${_TMP_CMAKE_RUNTIME_OUTPUT_DIRECTORY})
