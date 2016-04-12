@@ -28,18 +28,23 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer:$
+// $Maintainer: Adam Tenderholt $
 // $Author: Adam Tenderholt $
 // --------------------------------------------------------------------------
 
 #ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEINITDIALOG_H
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEINITDIALOG_H
 
+#include <iostream>
+
+#include <PeakInvestigator/Actions/InitAction.h>
+
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
 
 #include "AbstractInitDialog.h"
 
 using Veritomyx::PeakInvestigator::EstimatedCosts;
+using Veritomyx::PeakInvestigator::ResponseTimeCosts;
 
 namespace OpenMS
 {
@@ -47,10 +52,23 @@ namespace OpenMS
   {
     public:
 
-      ConsoleInitDialog(String title, EstimatedCosts costs, double funds);
+      ConsoleInitDialog(String title, EstimatedCosts costs, double funds, std::istream* input = &std::cin, std::ostream* output = &std::cout);
       ~ConsoleInitDialog();
 
       bool exec();
+      void printMenu();
+
+      static String formatTableHeader(const std::list<std::string>& RTOs);
+      static String formatTableLine(String instrument, const ResponseTimeCosts& instrumentCost);
+      static String formatTable(const EstimatedCosts& costs);
+      static String formatLine(int i, String RTO);
+
+    protected:
+      void selectRTO_(unsigned int index);
+
+      std::istream* input_;
+      std::ostream* output_;
+      std::list<std::string> RTOs_;
 
   };
 }

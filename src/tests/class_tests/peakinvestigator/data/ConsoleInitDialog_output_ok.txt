@@ -1,0 +1,15 @@
+
+
+The following Response Time Objectives (<= XX hours), and their associated
+costs (in USD), are available:
+
+	          RTO-24   RTO-8
+	          ------   -----
+	IonTrap    32.59   85.00
+	Orbitrap   36.22  300.12
+	TOF        27.60 1234.50
+
+	(1) RTO-24
+	(2) RTO-8
+
+Please enter your choice (0 to cancel): 
