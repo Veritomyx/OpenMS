@@ -32,14 +32,25 @@
 // $Author: Adam Tenderholt $
 // --------------------------------------------------------------------------
 
+#include <sstream>
+#include <iomanip>
+
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleInitDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogSelector.h>
+
+#define INPUT *input_
+#define OUTPUT *output_
 
 namespace OpenMS
 {
-  ConsoleInitDialog::ConsoleInitDialog(String title, EstimatedCosts costs, double funds)
+  ConsoleInitDialog::ConsoleInitDialog(String title, EstimatedCosts costs, double funds, std::istream* input, std::ostream* output)
     : AbstractInitDialog(title, costs, funds)
   {
+    input_ = input;
+    output_ = output;
 
+    std::map<std::string, ResponseTimeCosts>::const_iterator iter = costs.begin();
+    RTOs_ = (iter->second).getRTOs();
   }
 
   ConsoleInitDialog::~ConsoleInitDialog()
@@ -49,7 +60,133 @@ namespace OpenMS
 
   bool ConsoleInitDialog::exec()
   {
+    OUTPUT << "\n\nThe following Response Time Objectives (<= XX hours), and their associated\n";
+    OUTPUT << "costs (in USD), are available:\n\n";
 
+    while(true)
+    {
+      printMenu();
+
+      unsigned int index;
+      try
+      {
+        index = ConsoleDialogSelector::select(INPUT);
+      }
+      catch(...)
+      {
+        input_->ignore(std::numeric_limits<std::streamsize>::max()); // go to end of stream;
+        OUTPUT << "\nInvalid entry. Please select from the following Response Time Objectives:\n\n";
+        continue;
+      }
+
+      if (index == 0) // Cancel
+      {
+        return false;
+      }
+      else if (index <= RTOs_.size())
+      {
+        selectRTO_(index);
+        return true;
+      }
+      else
+      {
+        OUTPUT << "\nInvalid number. Please select from the following Response Time Objectives:\n\n";
+      }
+    }
+  }
+
+  void ConsoleInitDialog::printMenu()
+  {
+    String table = formatTable(costs_);
+    OUTPUT << table << "\n";
+
+    std::list<std::string>::const_iterator iter;
+    unsigned int i;
+    for(i = 1, iter = RTOs_.begin(); iter != RTOs_.end(); ++i, ++iter)
+    {
+      String line = formatLine(i, *iter);
+      OUTPUT << line;
+    }
+
+    OUTPUT << "\nPlease enter your choice (0 to cancel): ";
+  }
+
+  String ConsoleInitDialog::formatLine(int i, String RTO)
+  {
+    std::ostringstream stream;
+    stream << "\t(" << i << ") " << RTO << "\n";
+    return stream.str();
+  }
+
+  String ConsoleInitDialog::formatTableHeader(const std::list<std::string>& RTOs)
+  {
+    std::stringstream textstream, linestream;
+    textstream << "\t" << std::setw(8) << " ";
+    linestream << "\t" << std::setw(8) << " ";
+
+    textstream.setf(std::ios::right);
+    linestream.setf(std::ios::right);
+
+    std::list<std::string>::const_iterator iter;
+    for(iter = RTOs.begin(); iter != RTOs.end(); ++iter)
+    {
+      textstream << std::setw(8) << *iter;
+      linestream << std::setw(8) << std::string(iter->size(), '-');
+    }
+
+    textstream << "\n";
+    linestream << "\n";
+    return textstream.str() + linestream.str();
+  }
+
+  String ConsoleInitDialog::formatTableLine(String instrument, const ResponseTimeCosts &instrumentCost)
+  {
+    std::stringstream stream;
+    stream << "\t" << std::setw(8) << std::left << instrument;
+
+    stream.precision(2);
+    stream.setf(std::ios::fixed);
+    stream.setf(std::ios::right);
+
+    std::list<std::string> RTOs = instrumentCost.getRTOs();
+    std::list<std::string>::const_iterator iter;
+    for(iter = RTOs.begin(); iter != RTOs.end(); ++iter)
+    {
+      double cost = instrumentCost.getCost(*iter);
+      stream << std::setw(8) << cost;
+    }
+
+    stream << "\n";
+    return stream.str();
+  }
+
+  String ConsoleInitDialog::formatTable(const EstimatedCosts& costs)
+  {
+    std::stringstream stream;
+    std::map<std::string, ResponseTimeCosts>::const_iterator iter = costs.begin();
+    if (iter == costs.end())
+    {
+      return "";
+    }
+
+    stream << formatTableHeader((iter->second).getRTOs());
+    while (iter != costs.end())
+    {
+      stream << formatTableLine(iter->first, iter->second);
+      iter++;
+    }
+
+    return stream.str();
+  }
+
+  void ConsoleInitDialog::selectRTO_(unsigned int index)
+  {
+    std::list<std::string>::const_iterator iter = RTOs_.begin();
+    for(unsigned int i = 0; i < index; i++)
+    {
+      selectedRTO_ = *iter;
+      ++iter;
+    }
   }
 
 }
