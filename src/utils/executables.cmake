@@ -83,4 +83,4 @@ foreach(i ${UTILS_executables} ${UTILS_executables_with_GUIlib})
 	list(APPEND sources_VS "${i}.cpp")
 endforeach(i)
 
-source_group("" FILES ${sources_VS})
+source_group("" FILES ${sources_VS} PeakInvestigator.cpp)
