@@ -71,7 +71,7 @@ std::istream& operator>>(std::istream& is, Entry& entry)
 
 namespace OpenMS
 {
-  ConsoleVersionDialog::ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream *input, std::ostream *output)
+  ConsoleVersionDialog::ConsoleVersionDialog(String title, std::list<std::string> versions, String current, String previous, std::istream *input, std::ostream *output)
     : AbstractVersionDialog(title, versions, current, previous)
   {
     input_ = input;
@@ -121,7 +121,7 @@ namespace OpenMS
 
   void ConsoleVersionDialog::printMenu()
   {
-    std::list<String>::const_iterator iter;
+    std::list<std::string>::const_iterator iter;
     unsigned int i;
     for(i = 0, iter = versions_.begin(); iter != versions_.end(); ++i, ++iter)
     {
@@ -155,7 +155,7 @@ namespace OpenMS
 
   void ConsoleVersionDialog::selectVersion_(unsigned int index)
   {
-    std::list<String>::const_iterator iter = versions_.begin();
+    std::list<std::string>::const_iterator iter = versions_.begin();
     for(unsigned int i = 0; i < index; i++)
     {
       selectedVersion_ = *iter;

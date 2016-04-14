@@ -54,7 +54,7 @@ START_SECTION(static String formatLine(int i, String version))
 END_SECTION
 
 START_SECTION(exec() cancel)
-  std::list<String> versions;
+  std::list<std::string> versions;
   versions.push_back("1.2");
   versions.push_back("1.0");
 
@@ -74,7 +74,7 @@ START_SECTION(exec() cancel)
 END_SECTION
 
 START_SECTION(exec() select first)
-  std::list<String> versions;
+  std::list<std::string> versions;
   versions.push_back("1.2");
   versions.push_back("1.0");
 
@@ -96,7 +96,7 @@ START_SECTION(exec() select first)
 END_SECTION
 
 START_SECTION(exec() select second)
-  std::list<String> versions;
+  std::list<std::string> versions;
   versions.push_back("1.2");
   versions.push_back("1.0");
 
@@ -117,7 +117,7 @@ START_SECTION(exec() select second)
 END_SECTION
 
 START_SECTION(exec() select invalid number)
-  std::list<String> versions;
+  std::list<std::string> versions;
   versions.push_back("1.2");
   versions.push_back("1.0");
 
@@ -137,7 +137,7 @@ START_SECTION(exec() select invalid number)
 END_SECTION
 
 START_SECTION(exec() select string)
-  std::list<String> versions;
+  std::list<std::string> versions;
   versions.push_back("1.2");
   versions.push_back("1.0");
 

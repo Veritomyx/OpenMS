@@ -51,7 +51,7 @@ namespace OpenMS
     return new ConsoleInitDialog(title, costs, funds);
   }
 
-  AbstractVersionDialog* ConsoleDialogFactory::getVersionDialog(String title, std::list<String> versions, String current, String previous)
+  AbstractVersionDialog* ConsoleDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)
   {
     return new ConsoleVersionDialog(title, versions, current, previous);
   }

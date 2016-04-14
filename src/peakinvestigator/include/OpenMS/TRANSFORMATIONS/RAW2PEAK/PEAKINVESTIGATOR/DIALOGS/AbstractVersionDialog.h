@@ -45,7 +45,7 @@ namespace OpenMS
   class PEAKINVESTIGATOR_DLLAPI AbstractVersionDialog
   {
     public:
-      AbstractVersionDialog(String title, std::list<String> versions, String current, String previous)
+      AbstractVersionDialog(String title, std::list<std::string> versions, String current, String previous)
       { title_ = title; versions_ = versions; current_ = current; previous_ = previous; }
 
       virtual ~AbstractVersionDialog() {}
@@ -55,7 +55,7 @@ namespace OpenMS
 
     protected:
       String title_;
-      std::list<String> versions_;
+      std::list<std::string> versions_;
       String current_;
       String previous_;
       String selectedVersion_;

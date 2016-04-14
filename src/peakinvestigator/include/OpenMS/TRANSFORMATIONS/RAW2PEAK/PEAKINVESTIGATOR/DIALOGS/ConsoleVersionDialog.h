@@ -46,7 +46,7 @@ namespace OpenMS
   class PEAKINVESTIGATOR_DLLAPI ConsoleVersionDialog : public AbstractVersionDialog
   {
     public:
-      ConsoleVersionDialog(String title, std::list<String> versions, String current, String previous, std::istream* input = &std::cin, std::ostream* output = &std::cout);
+      ConsoleVersionDialog(String title, std::list<std::string> versions, String current, String previous, std::istream* input = &std::cin, std::ostream* output = &std::cout);
       ~ConsoleVersionDialog();
 
       bool exec();
