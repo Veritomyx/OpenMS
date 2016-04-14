@@ -35,6 +35,10 @@
 #ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_H
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_H
 
+#include <PeakInvestigator/Actions/InitAction.h>
+#include <PeakInvestigator/Actions/SftpAction.h>
+#include <PeakInvestigator/Actions/RunAction.h>
+
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <OpenMS/KERNEL/MSExperiment.h>
 #include <OpenMS/KERNEL/MSSpectrum.h>
@@ -53,6 +57,10 @@ namespace Veritomyx
   }
 }
 
+using Veritomyx::PeakInvestigator::InitAction;
+using Veritomyx::PeakInvestigator::SftpAction;
+using Veritomyx::PeakInvestigator::RunAction;
+
 namespace OpenMS
 {
   /**
@@ -64,6 +72,8 @@ namespace OpenMS
 
     @ingroup PeakPicking
   */
+
+  class AbstractDialogFactory;
 
   class PEAKINVESTIGATOR_DLLAPI PeakInvestigator :
       public DefaultParamHandler,
@@ -112,11 +122,17 @@ namespace OpenMS
 
     protected:
 
-      void submit_();
+
       void check_();
       void fetch_();
 
+      void submit_();
       String getVersion_();
+      InitAction initializeJob_(String version);
+      String getRTO_(InitAction &action);
+      void saveScans_(String filename);
+      SftpAction getSftpInfo_();
+      RunAction runJob_(String job, String RTO, String filename);
 
 #ifdef WITH_GUI
       /** @brief getVersionDlg to ask the user which API version they would like to use.
@@ -158,6 +174,9 @@ namespace OpenMS
       Veritomyx::PeakInvestigator::PeakInvestigatorSaaS* service_;
       MSExperiment<Peak1D> experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
+
+      // Dialog factory
+      AbstractDialogFactory* dialog_factory_;
 
   }; // end PeakInvestigator
 

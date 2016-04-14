@@ -36,11 +36,15 @@
 #include <cmath>
 
 #include <PeakInvestigator/PeakInvestigatorSaaS.h>
+#include <PeakInvestigator/TarFile.h>
 #include <PeakInvestigator/Actions/PiVersionsAction.h>
-#include <PeakInvestigator/Actions/InitAction.h>
+#include <PeakInvestigator/Actions/RunAction.h>
 
 #include <OpenMS/FORMAT/PeakTypeEstimator.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogFactory.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractInitDialog.h>
 
 //#ifdef WITH_GUI
 //#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/RtoDialog.h>
@@ -71,12 +75,14 @@ namespace OpenMS
     updateMembers_();
 
     service_ = new PeakInvestigatorSaaS(server_);
+    dialog_factory_ = new ConsoleDialogFactory();
 
   }
 
   PeakInvestigator::~PeakInvestigator()
   {
     delete service_;
+    delete dialog_factory_;
   }
 
   void PeakInvestigator::run()
@@ -124,21 +130,25 @@ namespace OpenMS
   void PeakInvestigator::submit_()
   {
     String version = getVersion_();
-
-    JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
-    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
-
-    String response = service_->executeAction(&action);
-    action.processResponse(response);
-
-    EstimatedCosts costs = action.getEstimatedCosts();
-    double funds = action.getFunds();
-    if(funds < costs.getMaximumCost(RTO_))
+    if (version.size() == 0)
     {
-      LOG_ERROR << "Insufficient funds: $" << std::fixed << std::setprecision(2) << funds << ".\n";
-      LOG_ERROR.unsetf(std::ios::floatfield);
       return;
     }
+
+    InitAction init_action = initializeJob_(version);
+    String RTO = getRTO_(init_action);
+
+// TODO:    String filename = File::getTempDirectory() + "/" + initAction.getJob() + ".tar";
+    String name = init_action.getJob() + ".tar";
+    String local_name = name;
+    saveScans_(name);
+
+    SftpAction sftp_action = getSftpInfo_();
+    String remote_name = sftp_action.getDirectory() + name;
+    service_->uploadFile(sftp_action, local_name, remote_name);
+
+    runJob_(init_action.getJob(), RTO, name);
+
   }
 
   void PeakInvestigator::check_()
@@ -159,7 +169,7 @@ namespace OpenMS
 
     if(action.hasError())
     {
-      throw std::runtime_error(action.getErrorMessage());
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getVersion_()", action.getErrorMessage());
     }
 
     if(PIVersion_.toLower() == "lastused")
@@ -172,12 +182,98 @@ namespace OpenMS
     }
     else if (PIVersion_.toLower() == "select")
     {
-      // handle selection
-      return "selected";
+      AbstractVersionDialog* dialog = dialog_factory_->getVersionDialog("Please select a version...",
+                                                                        action.getVersionsList(), action.getCurrentVersion(),
+                                                                        action.getLastUsedVersion());
+      bool retval = dialog->exec();
+      String version = retval ? dialog->getSelectedVersion() : "";
+      delete dialog;
+      return version;
     }
 
-    throw std::runtime_error("Invalid version specification.");
+    throw Exception::InvalidParameter(__FILE__, __LINE__, "PeakInvestigator::getVersion_()", "Invalid version specification.");
 
+  }
+
+  InitAction PeakInvestigator::initializeJob_(String version)
+  {
+    JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
+    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
+
+    String response = service_->executeAction(&action);
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::submit_()", action.getErrorMessage());
+    }
+
+    return action;
+  }
+
+  String PeakInvestigator::getRTO_(InitAction& action)
+  {
+    EstimatedCosts costs = action.getEstimatedCosts();
+    double funds = action.getFunds();
+
+    AbstractInitDialog* dialog = dialog_factory_->getInitDialog("Please select a Response Time Objective...", costs, funds);
+    bool retval = dialog->exec();
+    if(!retval)
+    {
+      return "";
+    }
+
+    String RTO = dialog->getSelectedRTO();
+    delete dialog;
+    return RTO;
+  }
+
+  void PeakInvestigator::saveScans_(String filename)
+  {
+    TarFile file(filename, SAVE);
+    for(Size i = 0; i < experiment_.size(); i++)
+    {
+      std::stringstream entryname, data;
+      entryname << "scan" << std::setfill('0') << std::setw(5) << i << ".txt";
+
+      MSSpectrum<Peak1D> spectrum = experiment_[i];
+      for(Size j = 0; j < spectrum.size(); j++)
+      {
+        data << spectrum[j].getMZ() << "\t" << spectrum[j].getIntensity() << "\n";
+      }
+
+      file.writeFile(entryname.str(), data);
+    }
+
+    file.close();
+  }
+
+  SftpAction PeakInvestigator::getSftpInfo_()
+  {
+    SftpAction action(username_, password_, projectID_);
+    String response = service_->executeAction(&action);
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getSftpInfo_()", action.getErrorMessage());
+    }
+
+    return action;
+  }
+
+  RunAction PeakInvestigator::runJob_(String job, String RTO, String filename)
+  {
+    RunAction action(username_, password_, job, RTO, filename);
+    String response = service_->executeAction(&action);
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::runJob_()", action.getErrorMessage());
+    }
+
+    return action;
   }
 
   JobAttributes PeakInvestigator::getJobAttributes(MSExperiment<Peak1D>& experiment)
