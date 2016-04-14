@@ -41,11 +41,12 @@ namespace OpenMS
 {
   class ConsoleDialogFactory : public AbstractDialogFactory
   {
+    public:
       ConsoleDialogFactory();
       ~ConsoleDialogFactory();
 
       AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds);
-      AbstractVersionDialog* getVersionDialog(String title, std::list<String> versions, String current, String previous);
+      AbstractVersionDialog* getVersionDialog(String title, std::list<std::string> versions, String current, String previous);
   };
 }
 

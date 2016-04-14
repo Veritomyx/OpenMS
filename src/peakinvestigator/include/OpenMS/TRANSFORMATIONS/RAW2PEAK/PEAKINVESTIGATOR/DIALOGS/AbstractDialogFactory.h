@@ -55,7 +55,7 @@ namespace OpenMS
       virtual ~AbstractDialogFactory() {}
 
       virtual AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds) = 0;
-      virtual AbstractVersionDialog* getVersionDialog(String title, std::list<String> versions, String current, String previous) = 0;
+      virtual AbstractVersionDialog* getVersionDialog(String title, std::list<std::string> versions, String current, String previous) = 0;
   };
 }
 
