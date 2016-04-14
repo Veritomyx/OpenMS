@@ -1,3 +1,4 @@
+project(PeakInvestigator)
 option(WITH_PEAKINVESTIGATOR "Build PeakInvestigator library and applications." ON)
 
 if(WITH_PEAKINVESTIGATOR)
