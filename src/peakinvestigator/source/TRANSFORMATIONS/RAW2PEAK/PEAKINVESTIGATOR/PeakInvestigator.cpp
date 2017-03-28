@@ -144,7 +144,7 @@ namespace OpenMS
     saveScans_(name);
 
     SftpAction sftp_action = getSftpInfo_();
-    String remote_name = sftp_action.getDirectory() + name;
+    String remote_name = sftp_action.getDirectory() + "/" + name;
     service_->uploadFile(sftp_action, local_name, remote_name);
 
     runJob_(init_action.getJob(), RTO, name);
@@ -199,6 +199,7 @@ namespace OpenMS
   {
     JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
     InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
+    std::cout << "action.buildQuery(): " << action.buildQuery();
 
     String response = service_->executeAction(&action);
     action.processResponse(response);
@@ -282,6 +283,7 @@ namespace OpenMS
     for(Size s = 0; s < experiment.size(); s++)
     {
       experiment[s].sortByPosition();
+      experiment[s].updateRanges();
       minMass = std::min(minMass, static_cast<int>(std::floor(experiment[s].getMin()[0])));
       maxMass = std::max(maxMass, static_cast<int>(std::ceil(experiment[s].getMax()[0])));
       maxPoints = std::max(maxPoints, static_cast<int>(experiment[s].size()));
@@ -290,6 +292,9 @@ namespace OpenMS
     JobAttributes attributes;
     attributes.min_mass = minMass;
     attributes.max_mass = maxMass;
+//TODO: handle Start and End better later
+    attributes.start_mass = minMass;
+    attributes.end_mass = maxMass;
     attributes.max_points = maxPoints;
 
     return attributes;

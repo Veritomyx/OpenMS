@@ -44,14 +44,13 @@
 #include <QComboBox>
 #include <QPushButton>
 
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorSaaSConfig.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
 
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/InitAction.h>
 
 namespace OpenMS
 {
 
-  class PEAKINVESTIGATORSAAS_DLLAPI RtoDialog : public QDialog
+  class PEAKINVESTIGATOR_DLLAPI RtoDialog : public QDialog
   {
 
       Q_OBJECT

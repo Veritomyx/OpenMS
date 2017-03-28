@@ -114,7 +114,7 @@ protected:
 
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
-    pi_param.parseCommandLine(argc, argv);
+//    pi_param.parseCommandLine(argc, argv);
 
     //----------------------------------------------------------------
     // Open file
@@ -177,6 +177,7 @@ protected:
         pp.setMode(PeakInvestigator::FETCH);
     }
 
+    pp.run();
     filename = out;
 
 // TODO: handle naming files
