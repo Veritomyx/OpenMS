@@ -104,10 +104,10 @@ namespace OpenMS
      * contains mass spectra and isn't already centroided).
      * @return Bool indicating whether the experiment has the correct attributes.
      */
-      bool setExperiment(MSExperiment<Peak1D>& experiment);
+      bool setExperiment(MSExperiment& experiment);
 
       /// Get the experiment after processing.
-      MSExperiment<Peak1D>& getExperiment() { return experiment_; }
+      MSExperiment& getExperiment() { return experiment_; }
 
       /// Get the jobID, which is set after a call to initializeJob_().
       String getJobID() { return job_; }
@@ -118,7 +118,7 @@ namespace OpenMS
       void run();
 
       /// Utility function to determine job attributes in an experiment
-      static Veritomyx::PeakInvestigator::JobAttributes getJobAttributes(MSExperiment<Peak1D>& experiment);
+      static Veritomyx::PeakInvestigator::JobAttributes getJobAttributes(MSExperiment& experiment);
 
     protected:
 
@@ -172,7 +172,7 @@ namespace OpenMS
 
       // Misc variables
       Veritomyx::PeakInvestigator::PeakInvestigatorSaaS* service_;
-      MSExperiment<Peak1D> experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
+      MSExperiment experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
 
       // Dialog factory

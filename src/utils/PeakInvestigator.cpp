@@ -119,7 +119,7 @@ protected:
     //----------------------------------------------------------------
     // Open file
     //----------------------------------------------------------------
-    MSExperiment<Peak1D> experiment;
+    MSExperiment experiment;
     MzMLFile input;
     input.load(in, experiment);
 
