@@ -108,7 +108,7 @@ namespace OpenMS
 
   }
 
-  bool PeakInvestigator::setExperiment(MSExperiment<Peak1D>& experiment)
+  bool PeakInvestigator::setExperiment(OpenMS::MSExperiment &experiment)
   {
     if (experiment.empty())
     {
@@ -277,7 +277,7 @@ namespace OpenMS
     return action;
   }
 
-  JobAttributes PeakInvestigator::getJobAttributes(MSExperiment<Peak1D>& experiment)
+  JobAttributes PeakInvestigator::getJobAttributes(OpenMS::MSExperiment &experiment)
   {
     int minMass = INT_MAX, maxMass = 0, maxPoints = 0;
     for(Size s = 0; s < experiment.size(); s++)
