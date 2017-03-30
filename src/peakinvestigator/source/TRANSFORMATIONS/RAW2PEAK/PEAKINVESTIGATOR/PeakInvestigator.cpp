@@ -287,6 +287,36 @@ namespace OpenMS
     return RTO;
   }
 
+  RunAction PeakInvestigator::runJob_(String job, String RTO, String filename)
+  {
+    RunAction action(username_, password_, job, RTO, filename);
+
+#ifdef DEBUG
+    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    String response = service_->executeAction(sandbox);
+    delete sandbox;
+#else
+    String response = service_->executeAction(&action);
+#endif
+
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::runJob_()", action.getErrorMessage());
+    }
+
+    // remove profile data
+    for (Size i = 0; i < experiment_.size(); i++)
+    {
+      experiment_[i].clear(false);
+    }
+
+    experiment_.setMetaValue(META_JOB, job);
+
+    return action;
+  }
+
   void PeakInvestigator::saveScans_(String filename)
   {
     TarFile file(filename, SAVE);
@@ -360,36 +390,6 @@ namespace OpenMS
     {
       throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getSftpInfo_()", action.getErrorMessage());
     }
-
-    return action;
-  }
-
-  RunAction PeakInvestigator::runJob_(String job, String RTO, String filename)
-  {
-    RunAction action(username_, password_, job, RTO, filename);
-
-#ifdef DEBUG
-    SandboxAction* sandbox = new SandboxAction(&action, 0);
-    String response = service_->executeAction(sandbox);
-    delete sandbox;
-#else
-    String response = service_->executeAction(&action);
-#endif
-
-    action.processResponse(response);
-
-    if(action.hasError())
-    {
-      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::runJob_()", action.getErrorMessage());
-    }
-
-    // remove profile data
-    for (Size i = 0; i < experiment_.size(); i++)
-    {
-      experiment_[i].clear(false);
-    }
-
-    experiment_.setMetaValue(META_JOB, job);
 
     return action;
   }
