@@ -292,6 +292,14 @@ namespace OpenMS
       throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::runJob_()", action.getErrorMessage());
     }
 
+    // remove profile data
+    for (Size i = 0; i < experiment_.size(); i++)
+    {
+      experiment_[i].clear(false);
+    }
+
+    experiment_.setMetaValue("veritomyx:job", job);
+
     return action;
   }
 
