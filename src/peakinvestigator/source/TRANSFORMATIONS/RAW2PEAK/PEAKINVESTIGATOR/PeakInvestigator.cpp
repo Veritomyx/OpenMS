@@ -37,6 +37,7 @@
 
 #include <PeakInvestigator/PeakInvestigatorSaaS.h>
 #include <PeakInvestigator/TarFile.h>
+#include <PeakInvestigator/Actions/DeleteAction.h>
 #include <PeakInvestigator/Actions/PiVersionsAction.h>
 #include <PeakInvestigator/Actions/RunAction.h>
 #include <PeakInvestigator/Actions/SandboxAction.h>
@@ -207,8 +208,11 @@ namespace OpenMS
     service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt");
 
     loadScans_(mass_lists);
+
     experiment_.removeMetaValue(META_JOB);
     experiment_.removeMetaValue(META_VERSION);
+
+    deleteJob_();
   }
 
   String PeakInvestigator::getVersion_()
@@ -392,6 +396,26 @@ namespace OpenMS
     }
 
     return action;
+  }
+
+  void PeakInvestigator::deleteJob_()
+  {
+    DeleteAction action(username_, password_, job_);
+
+#ifdef DEBUG
+    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    String response = service_->executeAction(sandbox);
+    delete sandbox;
+#else
+    String response = service_->executeAction(&action);
+#endif
+
+    action.processResponse(response);
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getdeleteJob_()", action.getErrorMessage());
+    }
+
   }
 
   JobAttributes PeakInvestigator::getJobAttributes(OpenMS::MSExperiment &experiment)

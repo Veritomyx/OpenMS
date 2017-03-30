@@ -145,7 +145,9 @@ namespace OpenMS
       void saveScans_(String filename);
       void loadScans_(String filename);
 
+      /* Misc methods. */
       SftpAction getSftpInfo_();
+      void deleteJob_();
 
 
 #ifdef WITH_GUI
