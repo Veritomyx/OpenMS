@@ -321,6 +321,7 @@ namespace OpenMS
     }
 
     experiment_.setMetaValue(META_JOB, job);
+    job_ = job;
 
     return action;
   }

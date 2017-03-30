@@ -142,26 +142,6 @@ protected:
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
 
-    //-----------------------------------------------------------------------------
-    // Set the filename with parsed JobID for later saving as needed
-    //-----------------------------------------------------------------------------
-    String filename;
-//    if (mode != "submit")
-//    {
-//        filename = in.toQString();
-//        const String jid("JobID_");
-//        const String mzml(".mzML");
-//        if(!filename.contains(jid)) {
-//            // The filename does not contain a JobID, error!
-//            std::cout << std::endl << "Error!:  input filename does not contain a Job ID!" << std::endl;
-//            return ILLEGAL_PARAMETERS;
-//        } else {
-//            int startIndex = filename.indexOf(jid, 1) + jid.count();
-//            int endIndex = filename.indexOf(mzml, startIndex);
-//            pp.setJobID(filename.mid(startIndex , endIndex - startIndex));
-//        }
-//    }
-
     if (mode == "submit")
     {
         pp.setMode(PeakInvestigator::SUBMIT);
@@ -180,30 +160,30 @@ protected:
     }
 
     pp.run();
-    filename = out;
 
-// TODO: handle naming files
-
-    // Set the filename and save the data if appropriate
-//    if (out == String::EMPTY)
-//    {
-//      if (mode == "submit")
-//      {
-//        filename = in.toQString().section(".", 0, -2) + ".JobID_" + pp.getJobID() + ".mzML";
-//      }
-//      else if (mode == "fetch")
-//      {
-//        filename = in.toQString().section(".", 0, -3) + ".peaks.mzML";
-//      }
-//    }
-//    else
-//    {
-//      filename = out.toQString();
-//    }
-    if (mode != "check" && mode != "delete")
+    LOG_INFO << "Out is: " << out << std::endl;
+    if (out.empty())
     {
-      input.store(filename, pp.getExperiment());
-      std::cout << std::endl << "The job was saved in the file " << filename << " for use in status checking and retrieving results." << std::endl;
+      std::vector<String> infos;
+
+      if (mode == "submit")
+      {
+        in.split('.', infos);
+        out.concatenate(infos.begin(), infos.end() - 1, '.');
+        out += ".job-" + pp.getJobID() + ".mzML";
+      }
+      else if (mode == "fetch")
+      {
+        in.split("job", infos);
+        out = infos[0] + "peaks.mzML";
+      }
+    }
+
+    LOG_INFO << "Storing file to " << out << std::endl;
+
+    if (mode != "check")
+    {
+      input.store(out, pp.getExperiment());
     }
 
     return TOPPBase::EXECUTION_OK;
