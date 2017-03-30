@@ -39,6 +39,7 @@
 #include <PeakInvestigator/TarFile.h>
 #include <PeakInvestigator/Actions/PiVersionsAction.h>
 #include <PeakInvestigator/Actions/RunAction.h>
+#include <PeakInvestigator/Actions/SandboxAction.h>
 
 #include <OpenMS/FORMAT/PeakTypeEstimator.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
@@ -52,6 +53,8 @@
 //#endif
 
 using namespace Veritomyx::PeakInvestigator;
+
+#define DEBUG 1
 
 namespace OpenMS
 {
@@ -201,8 +204,15 @@ namespace OpenMS
     InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
     std::cout << "action.buildQuery(): " << action.buildQuery();
 
+#ifdef DEBUG
+    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    String response = service_->executeAction(sandbox);
+    delete sandbox;
+#else
     String response = service_->executeAction(&action);
+#endif
     action.processResponse(response);
+
 
     if(action.hasError())
     {
@@ -266,7 +276,15 @@ namespace OpenMS
   RunAction PeakInvestigator::runJob_(String job, String RTO, String filename)
   {
     RunAction action(username_, password_, job, RTO, filename);
+
+#ifdef DEBUG
+    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    String response = service_->executeAction(sandbox);
+    delete sandbox;
+#else
     String response = service_->executeAction(&action);
+#endif
+
     action.processResponse(response);
 
     if(action.hasError())
