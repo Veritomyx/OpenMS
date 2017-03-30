@@ -84,6 +84,10 @@ namespace OpenMS
     service_ = new PeakInvestigatorSaaS(server_);
     dialog_factory_ = new ConsoleDialogFactory();
 
+#ifdef DEBUG
+    LOG_INFO << "*** Using API sandbox. ****" << std::endl;
+#endif
+
   }
 
   PeakInvestigator::~PeakInvestigator()
@@ -199,8 +203,8 @@ namespace OpenMS
     }
 
     SftpAction action = getSftpInfo_();
-    LOG_INFO << "Results: " << status_action.getResultsFilename() << std::endl;
-    LOG_INFO << "Log: " << status_action.getLogFilename() << std::endl;
+    LOG_DEBUG << "Results – " << status_action.getResultsFilename() << std::endl;
+    LOG_DEBUG << "Log – " << status_action.getLogFilename() << std::endl;
 
     String mass_lists = job_ + ".mass_list.tar";
 
@@ -351,8 +355,9 @@ namespace OpenMS
     std::string entry = file.readNextFile(contents);
     while(!entry.empty())
     {
-      int scan_num;
+      LOG_DEBUG << "Processing " << entry << std::endl;
 
+      int scan_num;
       sscanf(entry.c_str(), "scan%d.mass_list.txt", &scan_num);
 
       MSSpectrum<Peak1D> spectrum = experiment_[scan_num];
@@ -374,6 +379,8 @@ namespace OpenMS
         Peak1D peak(mz, intensity);
         spectrum.push_back(peak);
       }
+
+      LOG_DEBUG << ".....found " << spectrum.size() << " peaks." << std::endl;
 
       spectrum.updateRanges();
       spectrum.setType(SpectrumSettings::PEAKS);
@@ -400,6 +407,8 @@ namespace OpenMS
 
   void PeakInvestigator::deleteJob_()
   {
+    LOG_DEBUG << "Delete job " << job_ << ".\n";
+
     DeleteAction action(username_, password_, job_);
 
 #ifdef DEBUG
