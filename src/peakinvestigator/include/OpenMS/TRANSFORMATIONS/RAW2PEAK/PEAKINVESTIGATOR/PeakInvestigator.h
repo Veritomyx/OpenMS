@@ -91,6 +91,9 @@ namespace OpenMS
         FETCH
       };
 
+      static const std::string META_JOB;
+      static const std::string META_VERSION;
+
       /// Constructor
       PeakInvestigator();
 
@@ -121,6 +124,7 @@ namespace OpenMS
 
       /// Utility function to determine job attributes in an experiment
       static Veritomyx::PeakInvestigator::JobAttributes getJobAttributes(MSExperiment& experiment);
+      static DataProcessing* getDataProcessing(MSExperiment& experiment);
 
     protected:
 

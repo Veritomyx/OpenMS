@@ -58,6 +58,9 @@ using namespace Veritomyx::PeakInvestigator;
 
 namespace OpenMS
 {
+  const std::string PeakInvestigator::META_JOB("peakinvestigator:job");
+  const std::string PeakInvestigator::META_VERSION("peakinvestigator:version");
+
   PeakInvestigator::PeakInvestigator() :
     DefaultParamHandler("PeakInvestigator"),
     ProgressLogger()
@@ -204,7 +207,8 @@ namespace OpenMS
     service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt");
 
     loadScans_(mass_lists);
-    experiment_.removeMetaValue("veritomyx:job");
+    experiment_.removeMetaValue(META_JOB);
+    experiment_.removeMetaValue(META_VERSION);
   }
 
   String PeakInvestigator::getVersion_()
@@ -262,6 +266,7 @@ namespace OpenMS
       throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::submit_()", action.getErrorMessage());
     }
 
+    experiment_.setMetaValue(META_VERSION, version);
     return action;
   }
 
@@ -304,8 +309,10 @@ namespace OpenMS
 
   void PeakInvestigator::loadScans_(String filename)
   {
-    std::stringstream contents;
+    boost::shared_ptr<DataProcessing> data_processing(getDataProcessing(experiment_));
+
     TarFile file(filename, LOAD);
+    std::stringstream contents;
 
     std::string entry = file.readNextFile(contents);
     while(!entry.empty())
@@ -330,12 +337,15 @@ namespace OpenMS
         sscanf(line.c_str(), "%lf\t%f\t%lf\t%f\t%lf\t%d", &mz, &intensity, &mz_error, &intensity_error,
                &minimum_error, &degrees_of_freedom);
 
-        LOG_INFO << "Pushing back: " << mz << "\t" << intensity << "\n";
         Peak1D peak(mz, intensity);
         spectrum.push_back(peak);
       }
 
       spectrum.updateRanges();
+      spectrum.setType(SpectrumSettings::PEAKS);
+      spectrum.getDataProcessing().push_back(data_processing);
+      experiment_[scan_num] = spectrum;
+
       entry = file.readNextFile(contents);
     }
   }
@@ -379,7 +389,7 @@ namespace OpenMS
       experiment_[i].clear(false);
     }
 
-    experiment_.setMetaValue("veritomyx:job", job);
+    experiment_.setMetaValue(META_JOB, job);
 
     return action;
   }
@@ -405,6 +415,21 @@ namespace OpenMS
     attributes.max_points = maxPoints;
 
     return attributes;
+  }
+
+  DataProcessing* PeakInvestigator::getDataProcessing(MSExperiment& experiment)
+  {
+    DataProcessing* data_processing = new DataProcessing();
+
+    std::set<DataProcessing::ProcessingAction> actions;
+    actions.insert(DataProcessing::PEAK_PICKING);
+    data_processing->setProcessingActions(actions);
+
+    data_processing->getSoftware().setName("PeakInvestigator");
+    data_processing->getSoftware().setVersion(experiment.getMetaValue(META_VERSION));
+    data_processing->setCompletionTime(DateTime::now());
+
+    return data_processing;
   }
 
   /*

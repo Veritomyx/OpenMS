@@ -170,13 +170,13 @@ protected:
     else if (mode == "check")
     {
         pp.setMode(PeakInvestigator::CHECK);
-        pp.setJobID(experiment.getMetaValue("veritomyx:job"));
+        pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
     }
 
     else if (mode == "fetch")
     {
         pp.setMode(PeakInvestigator::FETCH);
-        pp.setJobID(experiment.getMetaValue("veritomyx:job"));
+        pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
     }
 
     pp.run();
