@@ -124,24 +124,29 @@ namespace OpenMS
 
       /// Utility function to determine job attributes in an experiment
       static Veritomyx::PeakInvestigator::JobAttributes getJobAttributes(MSExperiment& experiment);
+
+      /// Utility function to create correct DataProcessing from an experiment
       static DataProcessing* getDataProcessing(MSExperiment& experiment);
 
     protected:
 
-
+      /* Main modes of running. */
+      void submit_();
       StatusAction check_();
       void fetch_();
 
-      void submit_();
+      /* Methods used for submitting a job. */
       String getVersion_();
       InitAction initializeJob_(String version);
       String getRTO_(InitAction &action);
+      RunAction runJob_(String job, String RTO, String filename);
 
+      /* Functions for saving/loading data from tarballs. */
       void saveScans_(String filename);
       void loadScans_(String filename);
 
       SftpAction getSftpInfo_();
-      RunAction runJob_(String job, String RTO, String filename);
+
 
 #ifdef WITH_GUI
       /** @brief getVersionDlg to ask the user which API version they would like to use.
