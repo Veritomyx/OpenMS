@@ -38,6 +38,7 @@
 #include <PeakInvestigator/Actions/InitAction.h>
 #include <PeakInvestigator/Actions/SftpAction.h>
 #include <PeakInvestigator/Actions/RunAction.h>
+#include <PeakInvestigator/Actions/StatusAction.h>
 
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <OpenMS/KERNEL/MSExperiment.h>
@@ -59,6 +60,7 @@ namespace Veritomyx
 
 using Veritomyx::PeakInvestigator::InitAction;
 using Veritomyx::PeakInvestigator::SftpAction;
+using Veritomyx::PeakInvestigator::StatusAction;
 using Veritomyx::PeakInvestigator::RunAction;
 
 namespace OpenMS
@@ -123,14 +125,17 @@ namespace OpenMS
     protected:
 
 
-      void check_();
+      StatusAction check_();
       void fetch_();
 
       void submit_();
       String getVersion_();
       InitAction initializeJob_(String version);
       String getRTO_(InitAction &action);
+
       void saveScans_(String filename);
+      void loadScans_(String filename);
+
       SftpAction getSftpInfo_();
       RunAction runJob_(String job, String RTO, String filename);
 

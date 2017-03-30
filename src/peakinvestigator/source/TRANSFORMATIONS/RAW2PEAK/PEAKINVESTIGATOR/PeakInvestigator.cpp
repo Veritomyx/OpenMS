@@ -154,14 +154,57 @@ namespace OpenMS
 
   }
 
-  void PeakInvestigator::check_()
+  StatusAction PeakInvestigator::check_()
   {
 
+    StatusAction action(username_, password_, job_);
+
+#ifdef DEBUG
+    SandboxAction* sandbox = new SandboxAction(&action, "Done");
+    String response = service_->executeAction(sandbox);
+    delete sandbox;
+#else
+    String response = service_->executeAction(&action);
+#endif
+
+    action.processResponse(response);
+
+    if(action.hasError())
+    {
+      throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::check_()", action.getErrorMessage());
+    }
+
+    return action;
   }
 
   void PeakInvestigator::fetch_()
   {
+    StatusAction status_action = check_();
+    switch(status_action.getStatus())
+    {
+    case StatusAction::PREPARING:
+    case StatusAction::RUNNING:
+      LOG_INFO << "The job (" << job_ << ") is still running." << std::endl;
+      return;
+    case StatusAction::DELETED:
+      LOG_INFO << "The job (" << job_ << ") has been deleted." << std::endl;
+      return;
+    case StatusAction::DONE:
+      LOG_INFO << "The job (" << job_ << ") has finished. Downloading results." << std::endl;
+      break;
+    }
 
+    SftpAction action = getSftpInfo_();
+    LOG_INFO << "Results: " << status_action.getResultsFilename() << std::endl;
+    LOG_INFO << "Log: " << status_action.getLogFilename() << std::endl;
+
+    String mass_lists = job_ + ".mass_list.tar";
+
+    service_->downloadFile(action, status_action.getResultsFilename(), mass_lists);
+    service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt");
+
+    loadScans_(mass_lists);
+    experiment_.removeMetaValue("veritomyx:job");
   }
 
   String PeakInvestigator::getVersion_()
@@ -257,6 +300,44 @@ namespace OpenMS
     }
 
     file.close();
+  }
+
+  void PeakInvestigator::loadScans_(String filename)
+  {
+    std::stringstream contents;
+    TarFile file(filename, LOAD);
+
+    std::string entry = file.readNextFile(contents);
+    while(!entry.empty())
+    {
+      int scan_num;
+
+      sscanf(entry.c_str(), "scan%d.mass_list.txt", &scan_num);
+
+      MSSpectrum<Peak1D> spectrum = experiment_[scan_num];
+      std::string line;
+      while(std::getline(contents, line))
+      {
+        if(line.empty() || line.at(0) == '#')
+        {
+          continue;
+        }
+
+        Peak1D::CoordinateType mz, mz_error, minimum_error;
+        Peak1D::IntensityType intensity, intensity_error;
+        int degrees_of_freedom;
+
+        sscanf(line.c_str(), "%lf\t%f\t%lf\t%f\t%lf\t%d", &mz, &intensity, &mz_error, &intensity_error,
+               &minimum_error, &degrees_of_freedom);
+
+        LOG_INFO << "Pushing back: " << mz << "\t" << intensity << "\n";
+        Peak1D peak(mz, intensity);
+        spectrum.push_back(peak);
+      }
+
+      spectrum.updateRanges();
+      entry = file.readNextFile(contents);
+    }
   }
 
   SftpAction PeakInvestigator::getSftpInfo_()
