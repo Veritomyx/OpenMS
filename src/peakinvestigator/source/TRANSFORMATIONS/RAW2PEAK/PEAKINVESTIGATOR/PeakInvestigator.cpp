@@ -55,6 +55,9 @@
 
 using namespace Veritomyx::PeakInvestigator;
 
+#define SCANS_EXT ".scans.tar"
+#define CALIB_EXT ".calib.tar"
+
 #define SANDBOX 1
 
 namespace OpenMS
@@ -116,6 +119,28 @@ namespace OpenMS
     endProgress();
   }
 
+  bool PeakInvestigator::setExperiment(MSExperiment& experiment)
+  {
+    bool retval = validateExperiment_(experiment);
+    if (retval)
+    {
+      experiment_ = experiment;
+    }
+
+    return retval;
+  }
+
+  bool PeakInvestigator::setCharacterization(MSExperiment& characterization)
+  {
+    bool retval = validateExperiment_(characterization);
+    if (retval)
+    {
+      characterization_ = characterization;
+    }
+
+    return retval;
+  }
+
   void PeakInvestigator::run()
   {
 
@@ -139,25 +164,6 @@ namespace OpenMS
 
   }
 
-  bool PeakInvestigator::setExperiment(OpenMS::MSExperiment &experiment)
-  {
-    if (experiment.empty())
-    {
-      LOG_ERROR << "The given file appears to not contain any m/z-intensity data points.";
-      return false;
-    }
-
-    //check for peak type (profile data required)
-    if (PeakTypeEstimator().estimateType(experiment[0].begin(), experiment[0].end()) == SpectrumSettings::PEAKS)
-    {
-      LOG_ERROR << "OpenMS peak type estimation indicates that this is not profile data!";
-      return false;
-    }
-
-    experiment_ = experiment;
-    return true;
-  }
-
   void PeakInvestigator::submit_()
   {
     String version = getVersion_();
@@ -169,16 +175,19 @@ namespace OpenMS
     InitAction init_action = initializeJob_(version);
     String RTO = getRTO_(init_action);
 
-// TODO:    String filename = File::getTempDirectory() + "/" + initAction.getJob() + ".tar";
-    String name = init_action.getJob() + ".tar";
-    String local_name = name;
-    saveScans_(name);
-
     SftpAction sftp_action = getSftpInfo_();
-    String remote_name = sftp_action.getDirectory() + "/" + name;
-    service_->uploadFile(sftp_action, local_name, remote_name, this);
 
-    runJob_(init_action.getJob(), RTO, name);
+    String scans_filename = init_action.getJob() + SCANS_EXT;
+    uploadScans_(sftp_action, experiment_, scans_filename);
+
+    String calib_filename = "";
+    if (characterization_.size() > 0)
+    {
+      calib_filename = init_action.getJob() + CALIB_EXT;
+      uploadScans_(sftp_action, characterization_, calib_filename);
+    }
+
+    runJob_(init_action.getJob(), RTO, scans_filename, calib_filename);
 
   }
 
@@ -276,7 +285,8 @@ namespace OpenMS
   InitAction PeakInvestigator::initializeJob_(String version)
   {
     JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
-    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
+    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes, characterization_.size());
+
     LOG_DEBUG << "action.buildQuery(): " << action.buildQuery() << std::endl;
 
 #ifdef SANDBOX
@@ -315,9 +325,19 @@ namespace OpenMS
     return RTO;
   }
 
-  RunAction PeakInvestigator::runJob_(String job, String RTO, String filename)
+  void PeakInvestigator::uploadScans_(SftpAction& sftp_action, const MSExperiment& experiment, const String filename)
   {
-    RunAction action(username_, password_, job, RTO, filename);
+    // TODO:    String filename = File::getTempDirectory() + "/" + initAction.getJob() + ".tar";
+    String local_name = filename;
+    saveScans_(experiment, filename);
+
+    String remote_name = sftp_action.getDirectory() + "/" + filename;
+    service_->uploadFile(sftp_action, local_name, remote_name, this);
+  }
+
+  RunAction PeakInvestigator::runJob_(String job, String RTO, String filename, String calib_filename)
+  {
+    RunAction action(username_, password_, job, RTO, filename, calib_filename);
 
 #ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, 0);
@@ -346,17 +366,17 @@ namespace OpenMS
     return action;
   }
 
-  void PeakInvestigator::saveScans_(String filename)
+  void PeakInvestigator::saveScans_(const MSExperiment& experiment, String filename)
   {
-    startProgress(0, experiment_.size(), "Exporting scan data...");
+    startProgress(0, experiment.size(), "Exporting scan data...");
 
     TarFile file(filename, SAVE);
-    for(Size i = 0; i < experiment_.size(); i++)
+    for(Size i = 0; i < experiment.size(); i++)
     {
       std::stringstream entryname, data;
       entryname << "scan" << std::setfill('0') << std::setw(5) << i << ".txt";
 
-      MSSpectrum<Peak1D> spectrum = experiment_[i];
+      MSSpectrum<Peak1D> spectrum = experiment[i];
       for(Size j = 0; j < spectrum.size(); j++)
       {
         data << spectrum[j].getMZ() << "\t" << spectrum[j].getIntensity() << "\n";
@@ -460,6 +480,24 @@ namespace OpenMS
       throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getdeleteJob_()", action.getErrorMessage());
     }
 
+  }
+
+  bool PeakInvestigator::validateExperiment_(OpenMS::MSExperiment &experiment)
+  {
+    if (experiment.empty())
+    {
+      LOG_ERROR << "The given file appears to not contain any m/z-intensity data points.";
+      return false;
+    }
+
+    //check for peak type (profile data required)
+    if (PeakTypeEstimator().estimateType(experiment[0].begin(), experiment[0].end()) == SpectrumSettings::PEAKS)
+    {
+      LOG_ERROR << "OpenMS peak type estimation indicates that this is not profile data!";
+      return false;
+    }
+
+    return true;
   }
 
   JobAttributes PeakInvestigator::getJobAttributes(OpenMS::MSExperiment &experiment)
