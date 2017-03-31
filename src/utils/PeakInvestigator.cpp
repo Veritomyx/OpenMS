@@ -92,7 +92,7 @@ protected:
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
     registerStringOption_("mode", "<text>", "", "mode to run PeakInvestigator job");
-    setValidStrings_("mode", ListUtils::create<String>("submit,check,fetch,delete"));
+    setValidStrings_("mode", ListUtils::create<String>("submit,fetch"));
 
     registerSubsection_("peakinvestigator", "PeakInvestigator account information");
   }
@@ -146,13 +146,6 @@ protected:
     {
         pp.setMode(PeakInvestigator::SUBMIT);
     }
-
-    else if (mode == "check")
-    {
-        pp.setMode(PeakInvestigator::CHECK);
-        pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
-    }
-
     else if (mode == "fetch")
     {
         pp.setMode(PeakInvestigator::FETCH);
@@ -184,10 +177,7 @@ protected:
       }
     }
 
-    if (mode != "check")
-    {
-      input.store(out, pp.getExperiment());
-    }
+    input.store(out, pp.getExperiment());
 
     return TOPPBase::EXECUTION_OK;
 
