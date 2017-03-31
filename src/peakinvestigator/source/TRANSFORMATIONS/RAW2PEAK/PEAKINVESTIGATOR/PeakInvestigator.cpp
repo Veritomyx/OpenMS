@@ -55,7 +55,7 @@
 
 using namespace Veritomyx::PeakInvestigator;
 
-#define DEBUG 1
+#define SANDBOX 1
 
 namespace OpenMS
 {
@@ -89,7 +89,7 @@ namespace OpenMS
       service_->setDebug();
     }
 
-#ifdef DEBUG
+#ifdef SANDBOX
     LOG_INFO << "*** Using API sandbox. ****" << std::endl;
 #endif
 
@@ -172,7 +172,7 @@ namespace OpenMS
 
     StatusAction action(username_, password_, job_);
 
-#ifdef DEBUG
+#ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, "Done");
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -264,7 +264,7 @@ namespace OpenMS
     InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
     std::cout << "action.buildQuery(): " << action.buildQuery();
 
-#ifdef DEBUG
+#ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, 0);
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -304,7 +304,7 @@ namespace OpenMS
   {
     RunAction action(username_, password_, job, RTO, filename);
 
-#ifdef DEBUG
+#ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, 0);
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -417,7 +417,7 @@ namespace OpenMS
 
     DeleteAction action(username_, password_, job_);
 
-#ifdef DEBUG
+#ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, 0);
     String response = service_->executeAction(sandbox);
     delete sandbox;
