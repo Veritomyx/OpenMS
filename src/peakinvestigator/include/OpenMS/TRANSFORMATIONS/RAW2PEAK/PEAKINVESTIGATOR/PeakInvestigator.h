@@ -35,6 +35,7 @@
 #ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_H
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_H
 
+#include <PeakInvestigator/AbstractProgress.h>
 #include <PeakInvestigator/Actions/InitAction.h>
 #include <PeakInvestigator/Actions/SftpAction.h>
 #include <PeakInvestigator/Actions/RunAction.h>
@@ -79,7 +80,8 @@ namespace OpenMS
 
   class PEAKINVESTIGATOR_DLLAPI PeakInvestigator :
       public DefaultParamHandler,
-      public ProgressLogger
+      public ProgressLogger,
+      public Veritomyx::PeakInvestigator::AbstractProgress
   {
 
     public:
@@ -121,6 +123,11 @@ namespace OpenMS
       void setJobID(const String jobID) { job_ = jobID; }
 
       void run();
+
+      /* Methods for displaying SFTP progress */
+      void initialize(const int total, const std::string label);
+      void setProgress(const int progress);
+      void finish();
 
       /// Utility function to determine job attributes in an experiment
       static Veritomyx::PeakInvestigator::JobAttributes getJobAttributes(MSExperiment& experiment);
