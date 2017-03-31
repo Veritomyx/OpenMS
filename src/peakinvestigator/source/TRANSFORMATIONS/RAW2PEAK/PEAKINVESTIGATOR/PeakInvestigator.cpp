@@ -62,7 +62,7 @@ namespace OpenMS
   const std::string PeakInvestigator::META_JOB("peakinvestigator:job");
   const std::string PeakInvestigator::META_VERSION("peakinvestigator:version");
 
-  PeakInvestigator::PeakInvestigator() :
+  PeakInvestigator::PeakInvestigator(int debug_level) :
     DefaultParamHandler("PeakInvestigator"),
     ProgressLogger()
   {
@@ -83,6 +83,11 @@ namespace OpenMS
 
     service_ = new PeakInvestigatorSaaS(server_);
     dialog_factory_ = new ConsoleDialogFactory();
+
+    if (debug_level > 0)
+    {
+      service_->setDebug();
+    }
 
 #ifdef DEBUG
     LOG_INFO << "*** Using API sandbox. ****" << std::endl;
