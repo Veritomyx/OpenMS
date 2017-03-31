@@ -159,7 +159,13 @@ protected:
         pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
     }
 
-    pp.run();
+    try
+    {
+      pp.run();
+    } catch (std::exception& e) {
+      LOG_ERROR << e.what() << std::endl;
+      return TOPPBase::INTERNAL_ERROR;
+    }
 
     LOG_INFO << "Out is: " << out << std::endl;
     if (out.empty())
