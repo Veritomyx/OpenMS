@@ -167,7 +167,6 @@ protected:
       return TOPPBase::INTERNAL_ERROR;
     }
 
-    LOG_INFO << "Out is: " << out << std::endl;
     if (out.empty())
     {
       std::vector<String> infos;
@@ -184,8 +183,6 @@ protected:
         out = infos[0] + "peaks.mzML";
       }
     }
-
-    LOG_INFO << "Storing file to " << out << std::endl;
 
     if (mode != "check")
     {
