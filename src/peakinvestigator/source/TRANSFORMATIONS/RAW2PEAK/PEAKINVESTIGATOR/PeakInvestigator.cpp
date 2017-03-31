@@ -101,6 +101,21 @@ namespace OpenMS
     delete dialog_factory_;
   }
 
+  void PeakInvestigator::initialize(const int total, const std::string label)
+  {
+    startProgress(0, total, label);
+  }
+
+  void PeakInvestigator::setProgress(const int progress)
+  {
+    ProgressLogger::setProgress(progress);
+  }
+
+  void PeakInvestigator::finish()
+  {
+    endProgress();
+  }
+
   void PeakInvestigator::run()
   {
 
@@ -161,7 +176,7 @@ namespace OpenMS
 
     SftpAction sftp_action = getSftpInfo_();
     String remote_name = sftp_action.getDirectory() + "/" + name;
-    service_->uploadFile(sftp_action, local_name, remote_name);
+    service_->uploadFile(sftp_action, local_name, remote_name, this);
 
     runJob_(init_action.getJob(), RTO, name);
 
@@ -213,8 +228,8 @@ namespace OpenMS
 
     String mass_lists = job_ + ".mass_list.tar";
 
-    service_->downloadFile(action, status_action.getResultsFilename(), mass_lists);
-    service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt");
+    service_->downloadFile(action, status_action.getResultsFilename(), mass_lists, this);
+    service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt", this);
 
     loadScans_(mass_lists);
 
@@ -262,7 +277,7 @@ namespace OpenMS
   {
     JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
     InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes);
-    std::cout << "action.buildQuery(): " << action.buildQuery();
+    LOG_DEBUG << "action.buildQuery(): " << action.buildQuery() << std::endl;
 
 #ifdef SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, 0);
@@ -333,6 +348,8 @@ namespace OpenMS
 
   void PeakInvestigator::saveScans_(String filename)
   {
+    startProgress(0, experiment_.size(), "Exporting scan data...");
+
     TarFile file(filename, SAVE);
     for(Size i = 0; i < experiment_.size(); i++)
     {
@@ -346,13 +363,20 @@ namespace OpenMS
       }
 
       file.writeFile(entryname.str(), data);
+
+      ProgressLogger::setProgress(i);
     }
 
     file.close();
+
+    endProgress();
   }
 
   void PeakInvestigator::loadScans_(String filename)
   {
+    int progress = 0;
+    startProgress(progress, experiment_.size(), "Loading mass lists...");
+
     boost::shared_ptr<DataProcessing> data_processing(getDataProcessing(experiment_));
 
     TarFile file(filename, LOAD);
@@ -393,8 +417,13 @@ namespace OpenMS
       spectrum.getDataProcessing().push_back(data_processing);
       experiment_[scan_num] = spectrum;
 
+      ProgressLogger::setProgress(progress);
+      progress++;
+
       entry = file.readNextFile(contents);
     }
+
+    endProgress();
   }
 
   SftpAction PeakInvestigator::getSftpInfo_()
