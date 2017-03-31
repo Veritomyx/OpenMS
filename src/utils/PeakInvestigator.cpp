@@ -102,7 +102,7 @@ protected:
     return PeakInvestigator().getDefaults();
   }
 
-  ExitCodes main_(int argc, const char ** argv)
+  ExitCodes main_(int /* argc */, const char ** /* argv */)
   {
     //-------------------------------------------------------------
     // parameter handling
@@ -114,7 +114,6 @@ protected:
 
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
-//    pi_param.parseCommandLine(argc, argv);
 
     //----------------------------------------------------------------
     // Open file
