@@ -113,6 +113,14 @@ namespace OpenMS
      */
       bool setExperiment(MSExperiment& experiment);
 
+      /** @brief Set the characterization file for processing
+     *
+     * This function also makes sure the file being set has the correct data (i.e.
+     * contains mass spectra and isn't already centroided).
+     * @return Bool indicating whether the experiment has the correct attributes.
+     */
+      bool setCharacterization(MSExperiment& characterization);
+
       /// Get the experiment after processing.
       MSExperiment& getExperiment() { return experiment_; }
 
@@ -146,15 +154,17 @@ namespace OpenMS
       String getVersion_();
       InitAction initializeJob_(String version);
       String getRTO_(InitAction &action);
-      RunAction runJob_(String job, String RTO, String filename);
+      void uploadScans_(SftpAction &sftp_action, const MSExperiment& experiment, const String filename);
+      RunAction runJob_(String job, String RTO, String filename, String calib_filename);
 
       /* Functions for saving/loading data from tarballs. */
-      void saveScans_(String filename);
+      void saveScans_(const MSExperiment &experiment, String filename);
       void loadScans_(String filename);
 
       /* Misc methods. */
       SftpAction getSftpInfo_();
       void deleteJob_();
+      bool validateExperiment_(MSExperiment& experiment);
 
 
 #ifdef WITH_GUI
@@ -196,6 +206,7 @@ namespace OpenMS
       // Misc variables
       Veritomyx::PeakInvestigator::PeakInvestigatorSaaS* service_;
       MSExperiment experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
+      MSExperiment characterization_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
 
       // Dialog factory

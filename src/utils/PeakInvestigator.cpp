@@ -88,6 +88,10 @@ protected:
   {
     registerInputFile_("in", "<file>", "", "input profile data file ", true);
     setValidFormats_("in", ListUtils::create<String>("mzML"));
+
+    registerInputFile_("ch", "<file>", "", "input characterization file", false);
+    setValidFormats_("ch", ListUtils::create<String>("mzML"));
+
     registerOutputFile_("out", "<file>", "", "output peak file ", false);
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
@@ -109,6 +113,7 @@ protected:
     //-------------------------------------------------------------
 
     in = getStringOption_("in");
+    ch = getStringOption_("ch");
     out = getStringOption_("out");
     mode = getStringOption_("mode");
 
@@ -121,6 +126,12 @@ protected:
     MSExperiment experiment;
     MzMLFile input;
     input.load(in, experiment);
+
+    MSExperiment characterization;
+    if (ch != String::EMPTY)
+    {
+      input.load(ch, characterization);
+    }
 
     //-------------------------------------------------------------
     // Setup a QCoreApplication for handling network requests
@@ -137,6 +148,11 @@ protected:
     pp.setParameters(pi_param);
 
     if (!pp.setExperiment(experiment))
+    {
+      return TOPPBase::INCOMPATIBLE_INPUT_DATA;
+    }
+
+    if (ch != String::EMPTY && !pp.setCharacterization(characterization))
     {
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
@@ -184,6 +200,7 @@ protected:
 
   // parameters
   String in;
+  String ch;
   String out;
   String mode;
 };
