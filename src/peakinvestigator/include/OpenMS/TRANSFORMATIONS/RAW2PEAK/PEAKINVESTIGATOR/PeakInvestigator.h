@@ -95,7 +95,7 @@ namespace OpenMS
       static const std::string META_VERSION;
 
       /// Constructor
-      PeakInvestigator();
+      PeakInvestigator(int debug_level = 0);
 
       /// Destructor
       virtual ~PeakInvestigator();

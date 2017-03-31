@@ -132,7 +132,7 @@ protected:
 //    QCoreApplication app(argc, argv2);
 //#endif
 
-    PeakInvestigator pp;
+    PeakInvestigator pp(debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
 
