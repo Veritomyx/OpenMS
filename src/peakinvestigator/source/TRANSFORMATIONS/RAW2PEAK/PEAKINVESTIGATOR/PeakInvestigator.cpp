@@ -34,6 +34,7 @@
 //
 
 #include <cmath>
+#include <regex>
 
 #include <PeakInvestigator/PeakInvestigatorSaaS.h>
 #include <PeakInvestigator/TarFile.h>
@@ -405,10 +406,25 @@ namespace OpenMS
     std::string entry = file.readNextFile(contents);
     while(!entry.empty())
     {
+      if (entry == "./")
+      {
+        entry = file.readNextFile(contents);
+        continue;
+      }
+
       LOG_DEBUG << "Processing " << entry << std::endl;
 
-      int scan_num;
-      sscanf(entry.c_str(), "scan%d.mass_list.txt", &scan_num);
+      std::regex regex(".*scan(\\d+)\\.mass_list\\.txt");
+      std::smatch match;
+
+      if(!std::regex_search(entry, match, regex))
+      {
+        throw std::runtime_error("Unable to parse entry: " + entry);
+      }
+
+      int scan_num = std::stoi(match.str(1));
+
+      LOG_DEBUG << "... for scan " << scan_num << std::endl;
 
       MSSpectrum<Peak1D> spectrum = experiment_[scan_num];
       std::string line;
