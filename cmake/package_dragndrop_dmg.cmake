@@ -248,6 +248,21 @@ install(FILES       ${PROJECT_SOURCE_DIR}/cmake/MacOSX/README
                     WORLD_READ
         COMPONENT   TOPPShell)
 
+########################################################### Cmake files
+set(OpenMSConfigLocation OpenMS-${CPACK_PACKAGE_VERSION}/share/OpenMS/cmake)
+
+install(EXPORT      OpenMSTargets
+        FILE        OpenMSTargets.cmake
+        NAMESPACE   OpenMS::
+        DESTINATION ${OpenMSConfigLocation}
+)
+
+install(FILES       ${CMAKE_CURRENT_BINARY_DIR}/OpenMSConfig.cmake
+                    ${CMAKE_CURRENT_BINARY_DIR}/OpenMSConfigVersion.cmake
+        DESTINATION ${OpenMSConfigLocation}
+        COMPONENT   Devel
+)
+
 ########################################################### Create dmg with background image
 if (DEFINED CMAKE_VERSION AND NOT "${CMAKE_VERSION}" VERSION_LESS "3.5")
   set(OPENMS_LOGO ${PROJECT_SOURCE_DIR}/cmake/MacOSX/openms_logo_large_transparent.png) ## For configuration of the script
