@@ -59,6 +59,16 @@ using namespace Veritomyx::PeakInvestigator;
 #define SCANS_EXT ".scans.tar"
 #define CALIB_EXT ".calib.tar"
 
+#define KEY_PI_SERVER "server"
+#define KEY_PI_USERNAME "username"
+#define KEY_PI_PASSWORD "password"
+#define KEY_PI_PROJECT "project"
+
+#define KEY_PI_MZ "m/z"
+#define KEY_PI_RTO "RTO"
+#define KEY_PI_VERSION "Version"
+
+
 #define SANDBOX 1
 
 namespace OpenMS
@@ -71,15 +81,15 @@ namespace OpenMS
     ProgressLogger()
   {
     // set default parameter values
-    defaults_.setValue("server", "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
-    defaults_.setValue("username", "USERNAME", "Username for account registered with Veritomyx");
-    defaults_.setValue("password", "PASSWORD", "Password for account registered with Veritomyx");
-    defaults_.setValue("project", 12345, "The project number used for the PeakInvestigator job");
+    defaults_.setValue(KEY_PI_SERVER, "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
+    defaults_.setValue(KEY_PI_USERNAME, "USERNAME", "Username for account registered with Veritomyx");
+    defaults_.setValue(KEY_PI_PASSWORD, "PASSWORD", "Password for account registered with Veritomyx");
+    defaults_.setValue(KEY_PI_PROJECT, 12345, "The project number used for the PeakInvestigator job");
 
-    defaults_.setValue("m/z", "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
+    defaults_.setValue(KEY_PI_MZ, "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
 
-    defaults_.setValue("RTO", "RTO-24", "Response Time Objective to use");
-    defaults_.setValue("Version", "1.2", "Version of Peak Investigator to use");
+    defaults_.setValue(KEY_PI_RTO, "RTO-24", "Response Time Objective to use");
+    defaults_.setValue(KEY_PI_VERSION, "select", "Version of PeakInvestigator to use");
 
     // write defaults into Param object param_
     defaultsToParam_();
@@ -260,7 +270,7 @@ namespace OpenMS
       throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getVersion_()", action.getErrorMessage());
     }
 
-    if(PIVersion_.toLower() == "lastused")
+    if(PIVersion_.toLower() == "last")
     {
       return action.getLastUsedVersion();
     }
@@ -796,12 +806,12 @@ namespace OpenMS
 
   void PeakInvestigator::updateMembers_()
   {
-    server_ = param_.getValue("server");
-    username_ = param_.getValue("username");
-    password_ = param_.getValue("password");
-    projectID_ = param_.getValue("project");
+    server_ = param_.getValue(KEY_PI_SERVER);
+    username_ = param_.getValue(KEY_PI_USERNAME);
+    password_ = param_.getValue(KEY_PI_PASSWORD);
+    projectID_ = param_.getValue(KEY_PI_PROJECT);
 
-    String  minMaxString = param_.getValue("m/z");
+    String  minMaxString = param_.getValue(KEY_PI_MZ);
     std::vector<String> minMaxSplit;
     if((minMaxString != "[min]:[max]") && minMaxString.split(':', minMaxSplit))
     {
@@ -809,8 +819,8 @@ namespace OpenMS
       max_mass_ = minMaxSplit[1].toInt();
     }
 
-    RTO_ = param_.getValue("RTO");
-    PIVersion_ = param_.getValue("Version");
+    RTO_ = param_.getValue(KEY_PI_RTO);
+    PIVersion_ = param_.getValue(KEY_PI_VERSION);
 
     DefaultParamHandler::updateMembers_();
   }
