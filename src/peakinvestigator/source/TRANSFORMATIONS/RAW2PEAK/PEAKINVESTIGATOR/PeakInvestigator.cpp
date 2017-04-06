@@ -49,10 +49,9 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractInitDialog.h>
 
-//#ifdef WITH_GUI
-//#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/RtoDialog.h>
-//#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/VersionDialog.h>
-//#endif
+#ifdef WITH_GUI
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIDialogFactory.h>
+#endif
 
 using namespace Veritomyx::PeakInvestigator;
 
@@ -96,7 +95,7 @@ namespace OpenMS
     updateMembers_();
 
     service_ = new PeakInvestigatorSaaS(server_);
-    dialog_factory_ = new ConsoleDialogFactory();
+    dialog_factory_ = new GUIDialogFactory();
 
     if (debug_level > 0)
     {
@@ -285,6 +284,8 @@ namespace OpenMS
                                                                         action.getLastUsedVersion());
       bool retval = dialog->exec();
       String version = retval ? dialog->getSelectedVersion() : "";
+      LOG_INFO << "Selected PI version: " << version << std::endl;
+
       delete dialog;
       return version;
     }
