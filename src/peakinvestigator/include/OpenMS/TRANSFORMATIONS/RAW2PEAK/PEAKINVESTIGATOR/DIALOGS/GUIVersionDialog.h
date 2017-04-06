@@ -51,10 +51,11 @@ namespace OpenMS
       bool exec();
 
     private slots:
-      void on_comboBox_currentIndexChanged(const QString& text);
+      void on_comboBox_currentIndexChanged(int index);
 
     private:
       Ui::VersionDialog ui_;
+      std::list<std::string> versions_;
   };
 }
 
