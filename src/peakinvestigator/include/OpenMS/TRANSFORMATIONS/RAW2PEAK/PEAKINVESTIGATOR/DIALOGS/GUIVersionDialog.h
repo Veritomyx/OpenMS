@@ -36,7 +36,13 @@
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIVERSIONDIALOG_H
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/UIC/ui_GUIVersionDialog.h>
+
+#include <QDialog>
+
+namespace Ui
+{
+  class VersionDialog;
+}
 
 namespace OpenMS
 {
@@ -54,7 +60,7 @@ namespace OpenMS
       void on_comboBox_currentIndexChanged(int index);
 
     private:
-      Ui::VersionDialog ui_;
+      Ui::VersionDialog* ui_;
       std::list<std::string> versions_;
   };
 }
