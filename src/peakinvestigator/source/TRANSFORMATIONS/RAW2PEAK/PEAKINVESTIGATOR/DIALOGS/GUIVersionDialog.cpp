@@ -35,61 +35,62 @@
 #include <OpenMS/DATASTRUCTURES/String.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
 
-using namespace OpenMS;
-
-GUIVersionDialog::GUIVersionDialog(String title, std::list<std::string> versions, String current, String previous)
-  : QDialog(), AbstractVersionDialog(title, versions, current, previous)
+namespace OpenMS
 {
-  ui_.setupUi(this);
-  versions_ = versions;
 
-  ui_.comboBox->clear();
-  std::list<std::string>::const_iterator iter;
-
-  for(iter = versions.begin(); iter != versions.end(); iter++)
+  GUIVersionDialog::GUIVersionDialog(String title, std::list<std::string> versions, String current, String previous)
+    : QDialog(), AbstractVersionDialog(title, versions, current, previous)
   {
-    QString version = QString::fromStdString(*iter);
-    QString current_ = current.toQString();
-    QString previous_ = previous.toQString();
+    ui_.setupUi(this);
+    versions_ = versions;
 
-    if (version == current_ && version == previous_)
+    ui_.comboBox->clear();
+    std::list<std::string>::const_iterator iter;
+
+    for(iter = versions.begin(); iter != versions.end(); iter++)
     {
-      version.append(" (current and last used)");
-    }
-    else if (version == current_)
-    {
-      version.append(" (current)");
-    }
-    else if (version == previous_)
-    {
-      version.append(" (last used)");
+      QString version = QString::fromStdString(*iter);
+      QString current_ = current.toQString();
+      QString previous_ = previous.toQString();
+
+      if (version == current_ && version == previous_)
+      {
+        version.append(" (current and last used)");
+      }
+      else if (version == current_)
+      {
+        version.append(" (current)");
+      }
+      else if (version == previous_)
+      {
+        version.append(" (last used)");
+      }
+
+      ui_.comboBox->addItem(version);
     }
 
-    ui_.comboBox->addItem(version);
+    ui_.comboBox->setCurrentIndex(0);
   }
 
-  ui_.comboBox->setCurrentIndex(0);
-}
-
-GUIVersionDialog::~GUIVersionDialog()
-{
-
-}
-
-bool GUIVersionDialog::exec()
-{
-  int retval = QDialog::exec();
-  return retval == QDialog::Accepted;
-}
-
-void GUIVersionDialog::on_comboBox_currentIndexChanged(int index)
-{
-  std::list<std::string>::const_iterator iter = versions_.begin();
-  for(int i = 0; i <= index; i++)
+  GUIVersionDialog::~GUIVersionDialog()
   {
-    selectedVersion_ = *iter;
-    ++iter;
+
   }
+
+  bool GUIVersionDialog::exec()
+  {
+    int retval = QDialog::exec();
+    return retval == QDialog::Accepted;
+  }
+
+  void GUIVersionDialog::on_comboBox_currentIndexChanged(int index)
+  {
+    std::list<std::string>::const_iterator iter = versions_.begin();
+    for(int i = 0; i <= index; i++)
+    {
+      selectedVersion_ = *iter;
+      ++iter;
+    }
+  }
+
 }
-
-
