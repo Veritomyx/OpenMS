@@ -41,9 +41,34 @@ GUIVersionDialog::GUIVersionDialog(String title, std::list<std::string> versions
   : QDialog(), AbstractVersionDialog(title, versions, current, previous)
 {
   ui_.setupUi(this);
+  versions_ = versions;
 
   ui_.comboBox->clear();
-  ui_.comboBox->addItem(title.toQString());
+  std::list<std::string>::const_iterator iter;
+
+  for(iter = versions.begin(); iter != versions.end(); iter++)
+  {
+    QString version = QString::fromStdString(*iter);
+    QString current_ = current.toQString();
+    QString previous_ = previous.toQString();
+
+    if (version == current_ && version == previous_)
+    {
+      version.append(" (current and last used)");
+    }
+    else if (version == current_)
+    {
+      version.append(" (current)");
+    }
+    else if (version == previous_)
+    {
+      version.append(" (last used)");
+    }
+
+    ui_.comboBox->addItem(version);
+  }
+
+  ui_.comboBox->setCurrentIndex(0);
 }
 
 GUIVersionDialog::~GUIVersionDialog()
@@ -53,14 +78,18 @@ GUIVersionDialog::~GUIVersionDialog()
 
 bool GUIVersionDialog::exec()
 {
-
   int retval = QDialog::exec();
   return retval == QDialog::Accepted;
 }
 
-void GUIVersionDialog::on_comboBox_currentIndexChanged(const QString &text)
+void GUIVersionDialog::on_comboBox_currentIndexChanged(int index)
 {
-  selectedVersion_ = text;
+  std::list<std::string>::const_iterator iter = versions_.begin();
+  for(int i = 0; i <= index; i++)
+  {
+    selectedVersion_ = *iter;
+    ++iter;
+  }
 }
 
 
