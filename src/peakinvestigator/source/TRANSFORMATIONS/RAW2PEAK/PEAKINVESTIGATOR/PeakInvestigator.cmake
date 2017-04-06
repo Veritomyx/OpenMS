@@ -58,17 +58,22 @@ set(PI_SOURCES
 
 if(WITH_GUI)
     # needed for qt4_wrap_ui_own
+
+    find_package(Qt4 REQUIRED QtGui)
+
     include(${OpenMS_GUI_SOURCE_DIR}/qt_wrap_ui.cmake)
     set(directory ${PI_HEADER_DIR}/DIALOGS/UIC)
 
-    set(PI_UI_SOURCES
-        DIALOGS/UIC/GUIVersionDialog.ui
+    set(ui_sources
+        GUIVersionDialog.ui
     )
 
-    qt4_wrap_ui_own(PI_UIC_SOURCES ${PI_UI_SOURCES})
-    message("uic'd files: ${PI_UIC_SOURCES}")
+    set(PI_UI_SOURCES)
+    foreach(i ${ui_sources})
+        list(APPEND PI_UI_SOURCES ${directory}/${i})
+    endforeach(i)
 
-#    set(PI_HEADERS ${PI_HEADERS} ${PI_UIC_SOURCES})
+    qt4_wrap_ui_own(PI_UIC_SOURCES ${PI_UI_SOURCES})
 
     list(APPEND PI_HEADERS
         DIALOGS/GUIDialogFactory.h
@@ -79,6 +84,17 @@ if(WITH_GUI)
         DIALOGS/GUIDialogFactory.cpp
         DIALOGS/GUIVersionDialog.cpp
     )
+
+    list(APPEND OpenMS_GUI_DEP_LIBRARIES
+        OpenMS_GUI
+    )
+
+    set(moc_sources
+        ${PI_HEADER_DIR}/DIALOGS/GUIVersionDialog.h
+    )
+
+    qt4_wrap_cpp(PI_MOC_SOURCES ${moc_sources})
+    message("PI moc: ${PI_MOC_SOURCES}")
 
 #    list(APPEND PI_HEADERS
 #        DIALOGS/GUIDialogFactory.h

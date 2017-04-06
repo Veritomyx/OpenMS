@@ -35,23 +35,27 @@
 #ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIVERSIONDIALOG_H
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIVERSIONDIALOG_H
 
-#include "UIC/ui_GUIVersionDialog.h"
-
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/UIC/ui_GUIVersionDialog.h>
 
-class GUIVersionDialog : public QDialog, AbstractVersionDialog
+namespace OpenMS
 {
+  class GUIVersionDialog : public QDialog, public AbstractVersionDialog
+  {
     Q_OBJECT
 
-  public:
-    GUIVersionDialog(String title, std::list<std::string> versions, String current, String previous);
-    ~GUIVersionDialog();
+    public:
+      GUIVersionDialog(String title, std::list<std::string> versions, String current, String previous);
+      ~GUIVersionDialog();
 
-    bool exec();
+      bool exec();
 
-  private slots:
-    void on_comboBox_currentIndexChanged(const QString& text);
-};
+    private slots:
+      void on_comboBox_currentIndexChanged(const QString& text);
 
+    private:
+      Ui::VersionDialog ui_;
+  };
+}
 
 #endif // OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIVERSIONDIALOG_H

@@ -35,6 +35,10 @@
 #include <OpenMS/APPLICATIONS/TOPPBase.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
 
+#ifdef WITH_GUI
+#include <QApplication>
+#endif
+
 //#ifdef WITH_GUI
 //#include <QApplication>
 //#else
@@ -106,7 +110,7 @@ protected:
     return PeakInvestigator().getDefaults();
   }
 
-  ExitCodes main_(int /* argc */, const char ** /* argv */)
+  ExitCodes main_(int argc, const char ** argv)
   {
     //-------------------------------------------------------------
     // parameter handling
@@ -134,14 +138,12 @@ protected:
     }
 
     //-------------------------------------------------------------
-    // Setup a QCoreApplication for handling network requests
+    // Setup a QApplication for GUI options
     //-------------------------------------------------------------
-//    char **argv2 = const_cast<char**>(argv);
-//#ifdef WITH_GUI
-//    QApplication app(argc, argv2);
-//#else
-//    QCoreApplication app(argc, argv2);
-//#endif
+#if WITH_GUI
+    char** argv2 = const_cast<char**>(argv);
+    QApplication app(argc, argv2);
+#endif
 
     PeakInvestigator pp(debug_level_);
     pp.setLogType(log_type_);
