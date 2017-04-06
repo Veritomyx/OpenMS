@@ -73,6 +73,9 @@ namespace OpenMS
     This class has three modes of operation (submit, check, and fetch) which are
     specified by the PeakInvestigator::setMode() function.
 
+    The default dialog factory is a ConsoleDialogFactory. This can be changed using the
+    setDialogFactory() function.
+
     @ingroup PeakPicking
   */
 
@@ -104,6 +107,12 @@ namespace OpenMS
 
       /// Set the mode to one of the following: SUBMIT, CHECK, FETCH
       void setMode(Mode mode) { mode_ = mode; }
+
+      /** @brief Set the desired dialog factory. This allows Console vs. GUI dialogs to be
+       * specified at runtime.
+       *
+       */
+      void setDialogFactory(AbstractDialogFactory* factory);
 
       /** @brief Set the experiment for processing
      *
