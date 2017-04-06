@@ -37,6 +37,7 @@
 
 #ifdef WITH_GUI
 #include <QApplication>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIDialogFactory.h>
 #endif
 
 //#ifdef WITH_GUI
@@ -82,6 +83,13 @@ public:
   {
   }
 
+  ~TOPPPeakInvestigator()
+  {
+#if WITH_GUI
+    delete app;
+#endif
+  }
+
 protected:
 
   /**
@@ -102,6 +110,10 @@ protected:
     registerStringOption_("mode", "<text>", "", "mode to run PeakInvestigator job");
     setValidStrings_("mode", ListUtils::create<String>("submit,fetch"));
 
+#if WITH_GUI
+    registerFlag_("gui", "Enable graphical interface dialogs");
+#endif
+
     registerSubsection_("peakinvestigator", "PeakInvestigator account information");
   }
 
@@ -121,8 +133,23 @@ protected:
     out = getStringOption_("out");
     mode = getStringOption_("mode");
 
+#ifdef WITH_GUI
+    gui = getFlag_("gui");
+#endif
+
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
+
+    //-------------------------------------------------------------
+    // Setup a QApplication for GUI options
+    //-------------------------------------------------------------
+#if WITH_GUI
+    if (gui)
+    {
+      char** argv2 = const_cast<char**>(argv);
+      app = new QApplication(argc, argv2);
+    }
+#endif
 
     //----------------------------------------------------------------
     // Open file
@@ -137,17 +164,16 @@ protected:
       input.load(ch, characterization);
     }
 
-    //-------------------------------------------------------------
-    // Setup a QApplication for GUI options
-    //-------------------------------------------------------------
-#if WITH_GUI
-    char** argv2 = const_cast<char**>(argv);
-    QApplication app(argc, argv2);
-#endif
-
     PeakInvestigator pp(debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
+
+#if WITH_GUI
+    if (gui)
+    {
+      pp.setDialogFactory(new GUIDialogFactory());
+    }
+#endif
 
     if (!pp.setExperiment(experiment))
     {
@@ -205,6 +231,12 @@ protected:
   String ch;
   String out;
   String mode;
+
+#if WITH_GUI
+  bool gui;
+  QApplication* app;
+#endif
+
 };
 
 
