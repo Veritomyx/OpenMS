@@ -34,17 +34,18 @@
 
 #include <OpenMS/DATASTRUCTURES/String.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/UIC/ui_GUIVersionDialog.h>
 
 namespace OpenMS
 {
 
   GUIVersionDialog::GUIVersionDialog(String title, std::list<std::string> versions, String current, String previous)
-    : QDialog(), AbstractVersionDialog(title, versions, current, previous)
+    : QDialog(), AbstractVersionDialog(title, versions, current, previous), ui_(new Ui::VersionDialog())
   {
-    ui_.setupUi(this);
+    ui_->setupUi(this);
     versions_ = versions;
 
-    ui_.comboBox->clear();
+    ui_->comboBox->clear();
     std::list<std::string>::const_iterator iter;
 
     for(iter = versions.begin(); iter != versions.end(); iter++)
@@ -66,15 +67,15 @@ namespace OpenMS
         version.append(" (last used)");
       }
 
-      ui_.comboBox->addItem(version);
+      ui_->comboBox->addItem(version);
     }
 
-    ui_.comboBox->setCurrentIndex(0);
+    ui_->comboBox->setCurrentIndex(0);
   }
 
   GUIVersionDialog::~GUIVersionDialog()
   {
-
+    delete ui_;
   }
 
   bool GUIVersionDialog::exec()
