@@ -56,13 +56,36 @@ set(PI_SOURCES
     DIALOGS/ConsoleDialogSelector.cpp
 )
 
-#if(WITH_GUI)
+if(WITH_GUI)
+    # needed for qt4_wrap_ui_own
+    include(${OpenMS_GUI_SOURCE_DIR}/qt_wrap_ui.cmake)
+    set(directory ${PI_HEADER_DIR}/DIALOGS/UIC)
+
+    set(PI_UI_SOURCES
+        DIALOGS/UIC/GUIVersionDialog.ui
+    )
+
+    qt4_wrap_ui_own(PI_UIC_SOURCES ${PI_UI_SOURCES})
+    message("uic'd files: ${PI_UIC_SOURCES}")
+
+#    set(PI_HEADERS ${PI_HEADERS} ${PI_UIC_SOURCES})
+
+    list(APPEND PI_HEADERS
+        DIALOGS/GUIDialogFactory.h
+        DIALOGS/GUIVersionDialog.h
+    )
+
+    list(APPEND PI_SOURCES
+        DIALOGS/GUIDialogFactory.cpp
+        DIALOGS/GUIVersionDialog.cpp
+    )
+
 #    list(APPEND PI_HEADERS
 #        DIALOGS/GUIDialogFactory.h
 #        DIALOGS/GUIVersionDialog.h
 #        DIALOGS/GUIInitDialog.h
 #        )
-#endif()
+endif()
 
 set(PeakInvestigatorHeaders)
 foreach(I ${PI_HEADERS})
