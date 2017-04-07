@@ -33,7 +33,7 @@
 // --------------------------------------------------------------------------
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIDialogFactory.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleInitDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIInitDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
 
 namespace OpenMS
@@ -48,7 +48,7 @@ namespace OpenMS
 
   AbstractInitDialog* GUIDialogFactory::getInitDialog(String title, EstimatedCosts costs, double funds)
   {
-    return new ConsoleInitDialog(title, costs, funds);
+    return new GUIInitDialog(title, costs, funds);
   }
 
   AbstractVersionDialog* GUIDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)

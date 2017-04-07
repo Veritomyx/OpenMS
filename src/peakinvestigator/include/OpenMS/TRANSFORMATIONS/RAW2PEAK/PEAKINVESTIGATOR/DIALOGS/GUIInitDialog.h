@@ -46,6 +46,8 @@ namespace Ui
   class InitDialog;
 }
 
+class QLabel;
+
 namespace OpenMS
 {
   class GUIInitDialog : public QDialog, public AbstractInitDialog
@@ -63,6 +65,5 @@ namespace OpenMS
 
     private:
       Ui::InitDialog* ui_;
-
   };
 }

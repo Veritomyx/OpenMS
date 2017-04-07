@@ -186,6 +186,7 @@ namespace OpenMS
 
     InitAction init_action = initializeJob_(version);
     String RTO = getRTO_(init_action);
+    LOG_DEBUG << "Using RTO: " << RTO << std::endl;
 
     SftpAction sftp_action = getSftpInfo_();
 
