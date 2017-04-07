@@ -248,10 +248,14 @@ namespace OpenMS
     LOG_DEBUG << "Results – " << status_action.getResultsFilename() << std::endl;
     LOG_DEBUG << "Log – " << status_action.getLogFilename() << std::endl;
 
-    String mass_lists = job_ + ".mass_list.tar";
+    String mass_lists = File::getTempDirectory() + "/" + job_ + ".mass_list.tar";
+    String log = out_path_ + "/" + job_ + ".log.txt";
+
+    LOG_DEBUG << "Downloading mass lists to: " << mass_lists << std::endl;
+    LOG_DEBUG << "Downloading log to: " << log << std::endl;
 
     service_->downloadFile(action, status_action.getResultsFilename(), mass_lists, this);
-    service_->downloadFile(action, status_action.getLogFilename(), job_ + ".log.txt", this);
+    service_->downloadFile(action, status_action.getLogFilename(), log, this);
 
     loadScans_(mass_lists);
 
@@ -341,9 +345,8 @@ namespace OpenMS
 
   void PeakInvestigator::uploadScans_(SftpAction& sftp_action, const MSExperiment& experiment, const String filename)
   {
-    // TODO:    String filename = File::getTempDirectory() + "/" + initAction.getJob() + ".tar";
-    String local_name = filename;
-    saveScans_(experiment, filename);
+    String local_name = File::getTempDirectory() + "/" + filename;
+    saveScans_(experiment, local_name);
 
     String remote_name = sftp_action.getDirectory() + "/" + filename;
     service_->uploadFile(sftp_action, local_name, remote_name, this);

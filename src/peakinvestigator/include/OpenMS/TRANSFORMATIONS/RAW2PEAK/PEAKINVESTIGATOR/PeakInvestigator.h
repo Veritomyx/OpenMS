@@ -108,6 +108,9 @@ namespace OpenMS
       /// Set the mode to one of the following: SUBMIT, CHECK, FETCH
       void setMode(Mode mode) { mode_ = mode; }
 
+      /// Needed for saving log filename
+      void setOutputPath(String out_path) { out_path_ = out_path; }
+
       /** @brief Set the desired dialog factory. This allows Console vs. GUI dialogs to be
        * specified at runtime.
        *
@@ -217,6 +220,7 @@ namespace OpenMS
       MSExperiment experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       MSExperiment characterization_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
+      String out_path_;
 
       // Dialog factory
       AbstractDialogFactory* dialog_factory_;

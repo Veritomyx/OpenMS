@@ -193,6 +193,7 @@ protected:
     {
         pp.setMode(PeakInvestigator::FETCH);
         pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
+        pp.setOutputPath(File::path(out));
     }
 
     try
