@@ -71,7 +71,7 @@ namespace OpenMS
   const std::string PeakInvestigator::META_JOB("peakinvestigator:job");
   const std::string PeakInvestigator::META_VERSION("peakinvestigator:version");
 
-  PeakInvestigator::PeakInvestigator(int debug_level) :
+  PeakInvestigator::PeakInvestigator(String mode, int debug_level) :
     DefaultParamHandler("PeakInvestigator"),
     ProgressLogger()
   {
@@ -81,10 +81,14 @@ namespace OpenMS
     defaults_.setValue(KEY_PI_PASSWORD, "PASSWORD", "Password for account registered with Veritomyx");
     defaults_.setValue(KEY_PI_PROJECT, 12345, "The project number used for the PeakInvestigator job");
 
-    defaults_.setValue(KEY_PI_MZ, "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
+    if (mode == "submit")
+    {
+      mode_ = PeakInvestigator::SUBMIT;
+      defaults_.setValue(KEY_PI_MZ, "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
 
-    defaults_.setValue(KEY_PI_RTO, "RTO-24", "Response Time Objective to use");
-    defaults_.setValue(KEY_PI_VERSION, "select", "Version of PeakInvestigator to use");
+      defaults_.setValue(KEY_PI_RTO, "RTO-24", "Response Time Objective to use");
+      defaults_.setValue(KEY_PI_VERSION, "select", "Version of PeakInvestigator to use");
+    }
 
     // write defaults into Param object param_
     defaultsToParam_();
@@ -817,16 +821,19 @@ namespace OpenMS
     password_ = param_.getValue(KEY_PI_PASSWORD);
     projectID_ = param_.getValue(KEY_PI_PROJECT);
 
-    String  minMaxString = param_.getValue(KEY_PI_MZ);
-    std::vector<String> minMaxSplit;
-    if((minMaxString != "[min]:[max]") && minMaxString.split(':', minMaxSplit))
+    if (mode_ == PeakInvestigator::SUBMIT)
     {
-      min_mass_ = minMaxSplit[0].toInt();
-      max_mass_ = minMaxSplit[1].toInt();
-    }
+      String  minMaxString = param_.getValue(KEY_PI_MZ);
+      std::vector<String> minMaxSplit;
+      if((minMaxString != "[min]:[max]") && minMaxString.split(':', minMaxSplit))
+      {
+        min_mass_ = minMaxSplit[0].toInt();
+        max_mass_ = minMaxSplit[1].toInt();
+      }
 
-    RTO_ = param_.getValue(KEY_PI_RTO);
-    PIVersion_ = param_.getValue(KEY_PI_VERSION);
+      RTO_ = param_.getValue(KEY_PI_RTO);
+      PIVersion_ = param_.getValue(KEY_PI_VERSION);
+    }
 
     DefaultParamHandler::updateMembers_();
   }

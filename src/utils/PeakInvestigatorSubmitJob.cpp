@@ -54,7 +54,7 @@ using namespace OpenMS;
 //-------------------------------------------------------------
 
 /**
-  @page TOPP_PeakInvestigator PeakInvestigator
+  @page TOPP_PeakInvestigator PeakInvestigatorSubmitJob
 
   @brief A tool for peak detection in profile data. Executes the peak picking using the @ref
   OpenMS::PeakInvestigator algorithm (see www.veritomyx.com for more details).
@@ -74,16 +74,18 @@ using namespace OpenMS;
 // We do not want this class to show up in the docu:
 /// @cond TOPPCLASSES
 
-class TOPPPeakInvestigator :
+class TOPPPeakInvestigatorSubmitJob :
   public TOPPBase
 {
 public:
-  TOPPPeakInvestigator() :
-    TOPPBase("PeakInvestigator", "Finds mass spectrometric peaks in profile mass spectra using the PeakInvestigator(TM) software.", false)
+  TOPPPeakInvestigatorSubmitJob() :
+    TOPPBase("PeakInvestigatorSubmitJob",
+                "Submit a job to the PeakInvestigator(TM) centroiding and deconvolution software service.",
+                false)
   {
   }
 
-  ~TOPPPeakInvestigator()
+  ~TOPPPeakInvestigatorSubmitJob()
   {
 #if WITH_GUI
     delete app;
@@ -91,10 +93,6 @@ public:
   }
 
 protected:
-
-  /**
-    @brief Helper class for the Low Memory peak-picking
-  */
 
   void registerOptionsAndFlags_()
   {
@@ -107,19 +105,16 @@ protected:
     registerOutputFile_("out", "<file>", "", "output peak file ", false);
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
-    registerStringOption_("mode", "<text>", "", "mode to run PeakInvestigator job");
-    setValidStrings_("mode", ListUtils::create<String>("submit,fetch"));
-
 #if WITH_GUI
     registerFlag_("gui", "Enable graphical interface dialogs");
 #endif
 
-    registerSubsection_("peakinvestigator", "PeakInvestigator account information");
+    registerSubsection_("peakinvestigator", "PeakInvestigator account information and options");
   }
 
   Param getSubsectionDefaults_(const String & /*section*/) const
   {
-    return PeakInvestigator().getDefaults();
+    return PeakInvestigator("submit").getDefaults();
   }
 
   ExitCodes main_(int argc, const char ** argv)
@@ -131,7 +126,6 @@ protected:
     in = getStringOption_("in");
     ch = getStringOption_("ch");
     out = getStringOption_("out");
-    mode = getStringOption_("mode");
 
 #ifdef WITH_GUI
     gui = getFlag_("gui");
@@ -164,7 +158,7 @@ protected:
       input.load(ch, characterization);
     }
 
-    PeakInvestigator pp(debug_level_);
+    PeakInvestigator pp("submit", debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
 
@@ -185,16 +179,11 @@ protected:
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
 
-    if (mode == "submit")
-    {
-        pp.setMode(PeakInvestigator::SUBMIT);
-    }
-    else if (mode == "fetch")
-    {
-        pp.setMode(PeakInvestigator::FETCH);
-        pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
-        pp.setOutputPath(File::path(out));
-    }
+//    if (mode == "fetch")
+//    {
+//        pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
+//        pp.setOutputPath(File::path(out));
+//    }
 
     try
     {
@@ -208,17 +197,15 @@ protected:
     {
       std::vector<String> infos;
 
-      if (mode == "submit")
-      {
-        in.split('.', infos);
-        out.concatenate(infos.begin(), infos.end() - 1, '.');
-        out += ".job-" + pp.getJobID() + ".mzML";
-      }
-      else if (mode == "fetch")
-      {
-        in.split("job", infos);
-        out = infos[0] + "peaks.mzML";
-      }
+      in.split('.', infos);
+      out.concatenate(infos.begin(), infos.end() - 1, '.');
+      out += ".job-" + pp.getJobID() + ".mzML";
+
+//      else if (mode == "fetch")
+//      {
+//        in.split("job", infos);
+//        out = infos[0] + "peaks.mzML";
+//      }
     }
 
     input.store(out, pp.getExperiment());
@@ -231,7 +218,6 @@ protected:
   String in;
   String ch;
   String out;
-  String mode;
 
 #if WITH_GUI
   bool gui;
@@ -243,7 +229,7 @@ protected:
 
 int main(int argc, const char ** argv)
 {
-  TOPPPeakInvestigator tool;
+  TOPPPeakInvestigatorSubmitJob tool;
   return tool.main(argc, argv);
 }
 
