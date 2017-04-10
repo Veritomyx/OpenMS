@@ -100,13 +100,10 @@ namespace OpenMS
       static const std::string META_VERSION;
 
       /// Constructor
-      PeakInvestigator(int debug_level = 0);
+      PeakInvestigator(String mode, int debug_level = 0);
 
       /// Destructor
       virtual ~PeakInvestigator();
-
-      /// Set the mode to one of the following: SUBMIT, CHECK, FETCH
-      void setMode(Mode mode) { mode_ = mode; }
 
       /// Needed for saving log filename
       void setOutputPath(String out_path) { out_path_ = out_path; }

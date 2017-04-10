@@ -75,11 +75,18 @@ include_directories(SYSTEM ${SuperHirn_INCLUDE_DIRECTORIES})
 target_link_libraries(FeatureFinderSuperHirn SuperHirn)
 
 # PeakInvestigator requires a custom executable since it's name conflicts with its library
-add_executable(PeakInvestigator-bin PeakInvestigator.cpp)
-set_target_properties(PeakInvestigator-bin PROPERTIES OUTPUT_NAME PeakInvestigator)
-install_tool(PeakInvestigator-bin)
-include_directories(SYSTEM ${PeakInvestigator_INCLUDE_DIRECTORIES})
-target_link_libraries(PeakInvestigator-bin PeakInvestigator ${OpenMS_LIBRARIES})
+if(WITH_PEAKINVESTIGATOR)
+    foreach(i PeakInvestigatorSubmitJob)
+        add_executable(${i} ${i}.cpp)
+        set_target_properties(${i} PROPERTIES OUTPUT_NAME ${i})
+        install_tool(${i})
+        include_directories(SYSTEM ${PeakInvestigator_INCLUDE_DIRECTORIES})
+        target_link_libraries(${i} PeakInvestigator ${OpenMS_LIBRARIES})
+    endforeach(i)
+
+    add_custom_target(PEAKINVESTIGATOR_TOOLS)
+    add_dependencies(PEAKINVESTIGATOR_TOOLS PeakInvestigatorSubmitJob)
+endif(WITH_PEAKINVESTIGATOR)
 
 ## export the list of UTILS tools into CACHE
 set(UTILS_TOOLS ${UTILS_executables}
