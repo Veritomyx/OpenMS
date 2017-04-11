@@ -174,23 +174,6 @@ namespace OpenMS
       void deleteJob_();
       bool validateExperiment_(MSExperiment& experiment);
 
-
-#ifdef WITH_GUI
-      /** @brief getVersionDlg to ask the user which API version they would like to use.
-     *
-     * Asks the user to select a version of Peak Investigator to use for quotations and running.
-     * Returns true if the dialog is Accepted, and false if Canceled
-     */
-      bool getVersionDlg(void);
-
-      /** @brief getRTODlg to ask the user which API version they would like to use.
-     *
-     * Asks the user to select the RTO to use in the run.
-     * Returns true if the dialog is Accepted, and false if Canceled
-     */
-      bool getRTODlg(void);
-#endif
-
       ///@}
       //--------------------------------------------------------------------------------------------------------
 
