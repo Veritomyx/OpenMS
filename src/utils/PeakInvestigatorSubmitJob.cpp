@@ -80,7 +80,7 @@ class TOPPPeakInvestigatorSubmitJob :
 public:
   TOPPPeakInvestigatorSubmitJob() :
     TOPPBase("PeakInvestigatorSubmitJob",
-                "Submit a job to the PeakInvestigator(TM) centroiding and deconvolution software service.",
+                "Submit a job to the PeakInvestigator(R) centroiding and deconvolution software service.",
                 false)
   {
   }

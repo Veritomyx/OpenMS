@@ -80,7 +80,7 @@ class TOPPPeakInvestigatorFetchResults :
 public:
   TOPPPeakInvestigatorFetchResults() :
     TOPPBase("PeakInvestigatorFetchResults",
-                "Fetch results from the PeakInvestigator(TM) centroiding and deconvolution software service.",
+                "Fetch results from the PeakInvestigator(R) centroiding and deconvolution software service.",
                 false)
   {
   }
