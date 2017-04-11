@@ -87,9 +87,6 @@ public:
 
   ~TOPPPeakInvestigatorFetchResults()
   {
-#if WITH_GUI
-    delete app;
-#endif
   }
 
 protected:
@@ -105,10 +102,6 @@ protected:
     registerOutputFile_("joblog", "<file>", "", "job log file ", false);
     setValidFormats_("joblog", ListUtils::create<String>("txt"));
 
-#if WITH_GUI
-    registerFlag_("gui", "Enable graphical interface dialogs");
-#endif
-
     registerSubsection_("peakinvestigator", "PeakInvestigator account information and options");
   }
 
@@ -117,7 +110,7 @@ protected:
     return PeakInvestigator("fetch").getDefaults();
   }
 
-  ExitCodes main_(int argc, const char ** argv)
+  ExitCodes main_(int /* argc */, const char ** /* argv */)
   {
     //-------------------------------------------------------------
     // parameter handling
@@ -127,23 +120,8 @@ protected:
     out = getStringOption_("out");
     log = getStringOption_("joblog");
 
-#ifdef WITH_GUI
-    gui = getFlag_("gui");
-#endif
-
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
-
-    //-------------------------------------------------------------
-    // Setup a QApplication for GUI options
-    //-------------------------------------------------------------
-#if WITH_GUI
-    if (gui)
-    {
-      char** argv2 = const_cast<char**>(argv);
-      app = new QApplication(argc, argv2);
-    }
-#endif
 
     //----------------------------------------------------------------
     // Open file
@@ -155,13 +133,6 @@ protected:
     PeakInvestigator pp("fetch", debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
-
-#if WITH_GUI
-    if (gui)
-    {
-      pp.setDialogFactory(new GUIDialogFactory());
-    }
-#endif
 
     if (!pp.setExperiment(experiment))
     {
@@ -198,11 +169,6 @@ protected:
   String in;
   String out;
   String log;
-
-#if WITH_GUI
-  bool gui;
-  QApplication* app;
-#endif
 
 };
 
