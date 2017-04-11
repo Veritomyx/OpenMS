@@ -177,9 +177,6 @@ namespace OpenMS
     case SUBMIT:
       submit_();
       break;
-    case CHECK:
-      check_();
-      break;
     case FETCH:
       fetch_();
       break;
