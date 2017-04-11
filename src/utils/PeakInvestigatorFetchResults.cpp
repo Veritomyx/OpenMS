@@ -54,7 +54,7 @@ using namespace OpenMS;
 //-------------------------------------------------------------
 
 /**
-  @page TOPP_PeakInvestigator PeakInvestigatorSubmitJob
+  @page TOPP_PeakInvestigator PeakInvestigatorFetchResults
 
   @brief A tool for peak detection in profile data. Executes the peak picking using the @ref
   OpenMS::PeakInvestigator algorithm (see www.veritomyx.com for more details).
@@ -74,18 +74,18 @@ using namespace OpenMS;
 // We do not want this class to show up in the docu:
 /// @cond TOPPCLASSES
 
-class TOPPPeakInvestigatorSubmitJob :
+class TOPPPeakInvestigatorFetchResults :
   public TOPPBase
 {
 public:
-  TOPPPeakInvestigatorSubmitJob() :
-    TOPPBase("PeakInvestigatorSubmitJob",
-                "Submit a job to the PeakInvestigator(TM) centroiding and deconvolution software service.",
+  TOPPPeakInvestigatorFetchResults() :
+    TOPPBase("PeakInvestigatorFetchResults",
+                "Fetch results from the PeakInvestigator(TM) centroiding and deconvolution software service.",
                 false)
   {
   }
 
-  ~TOPPPeakInvestigatorSubmitJob()
+  ~TOPPPeakInvestigatorFetchResults()
   {
 #if WITH_GUI
     delete app;
@@ -96,13 +96,10 @@ protected:
 
   void registerOptionsAndFlags_()
   {
-    registerInputFile_("in", "<file>", "", "input profile data file ", true);
+    registerInputFile_("in", "<file>", "", "input meta data file ", true);
     setValidFormats_("in", ListUtils::create<String>("mzML"));
 
-    registerInputFile_("ch", "<file>", "", "input characterization file", false);
-    setValidFormats_("ch", ListUtils::create<String>("mzML"));
-
-    registerOutputFile_("out", "<file>", "", "output meta data file ", false);
+    registerOutputFile_("out", "<file>", "", "output peak file ", false);
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
 #if WITH_GUI
@@ -114,7 +111,7 @@ protected:
 
   Param getSubsectionDefaults_(const String & /*section*/) const
   {
-    return PeakInvestigator("submit").getDefaults();
+    return PeakInvestigator("fetch").getDefaults();
   }
 
   ExitCodes main_(int argc, const char ** argv)
@@ -124,7 +121,6 @@ protected:
     //-------------------------------------------------------------
 
     in = getStringOption_("in");
-    ch = getStringOption_("ch");
     out = getStringOption_("out");
 
 #ifdef WITH_GUI
@@ -152,13 +148,7 @@ protected:
     MzMLFile input;
     input.load(in, experiment);
 
-    MSExperiment characterization;
-    if (ch != String::EMPTY)
-    {
-      input.load(ch, characterization);
-    }
-
-    PeakInvestigator pp("submit", debug_level_);
+    PeakInvestigator pp("fetch", debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
 
@@ -174,10 +164,9 @@ protected:
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
 
-    if (ch != String::EMPTY && !pp.setCharacterization(characterization))
-    {
-      return TOPPBase::INCOMPATIBLE_INPUT_DATA;
-    }
+    pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
+    pp.setOutputPath(File::path(out));
+
 
     try
     {
@@ -191,10 +180,8 @@ protected:
     {
       std::vector<String> infos;
 
-      in.split('.', infos);
-      out.concatenate(infos.begin(), infos.end() - 1, '.');
-      out += ".job-" + pp.getJobID() + ".mzML";
-
+      in.split("job", infos);
+      out = infos[0] + "peaks.mzML";
     }
 
     input.store(out, pp.getExperiment());
@@ -205,7 +192,6 @@ protected:
 
   // parameters
   String in;
-  String ch;
   String out;
 
 #if WITH_GUI
@@ -218,7 +204,7 @@ protected:
 
 int main(int argc, const char ** argv)
 {
-  TOPPPeakInvestigatorSubmitJob tool;
+  TOPPPeakInvestigatorFetchResults tool;
   return tool.main(argc, argv);
 }
 

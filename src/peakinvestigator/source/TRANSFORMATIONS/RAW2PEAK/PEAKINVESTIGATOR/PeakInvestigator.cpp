@@ -88,6 +88,13 @@ namespace OpenMS
 
       defaults_.setValue(KEY_PI_RTO, "RTO-24", "Response Time Objective to use");
       defaults_.setValue(KEY_PI_VERSION, "select", "Version of PeakInvestigator to use");
+    } else if (mode == "fetch")
+    {
+      mode_ = PeakInvestigator::FETCH;
+    } else
+    {
+      throw Exception::IllegalArgument(__FILE__, __LINE__, "PeakInvestigator::PeakInvestigator",
+                                       "Invalid mode: " + mode);
     }
 
     // write defaults into Param object param_
