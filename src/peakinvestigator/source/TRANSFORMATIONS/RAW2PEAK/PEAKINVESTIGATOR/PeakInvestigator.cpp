@@ -257,13 +257,12 @@ namespace OpenMS
     LOG_DEBUG << "Log – " << status_action.getLogFilename() << std::endl;
 
     String mass_lists = File::getTempDirectory() + "/" + job_ + ".mass_list.tar";
-    String log = out_path_ + "/" + job_ + ".log.txt";
 
     LOG_DEBUG << "Downloading mass lists to: " << mass_lists << std::endl;
-    LOG_DEBUG << "Downloading log to: " << log << std::endl;
+    LOG_DEBUG << "Downloading log to: " << log_path_ << std::endl;
 
     service_->downloadFile(action, status_action.getResultsFilename(), mass_lists, this);
-    service_->downloadFile(action, status_action.getLogFilename(), log, this);
+    service_->downloadFile(action, status_action.getLogFilename(), log_path_, this);
 
     loadScans_(mass_lists);
 

@@ -102,6 +102,9 @@ protected:
     registerOutputFile_("out", "<file>", "", "output peak file ", false);
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
+    registerOutputFile_("joblog", "<file>", "", "job log file ", false);
+    setValidFormats_("joblog", ListUtils::create<String>("txt"));
+
 #if WITH_GUI
     registerFlag_("gui", "Enable graphical interface dialogs");
 #endif
@@ -122,6 +125,7 @@ protected:
 
     in = getStringOption_("in");
     out = getStringOption_("out");
+    log = getStringOption_("joblog");
 
 #ifdef WITH_GUI
     gui = getFlag_("gui");
@@ -164,9 +168,9 @@ protected:
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
 
-    pp.setJobID(experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB));
-    pp.setOutputPath(File::path(out));
-
+    String job = experiment.getMetaValue(OpenMS::PeakInvestigator::META_JOB);
+    pp.setJobID(job);
+    pp.setLogPath(log.empty() ? job + ".log.txt" : log);
 
     try
     {
@@ -193,6 +197,7 @@ protected:
   // parameters
   String in;
   String out;
+  String log;
 
 #if WITH_GUI
   bool gui;

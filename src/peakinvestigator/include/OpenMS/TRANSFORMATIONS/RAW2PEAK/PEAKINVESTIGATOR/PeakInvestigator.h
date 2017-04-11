@@ -104,9 +104,6 @@ namespace OpenMS
       /// Destructor
       virtual ~PeakInvestigator();
 
-      /// Needed for saving log filename
-      void setOutputPath(String out_path) { out_path_ = out_path; }
-
       /** @brief Set the desired dialog factory. This allows Console vs. GUI dialogs to be
        * specified at runtime.
        *
@@ -137,6 +134,9 @@ namespace OpenMS
 
       /// Set the jobID.
       void setJobID(const String jobID) { job_ = jobID; }
+
+      /// Set the path for the log file when fetching job
+      void setLogPath(const String log_path) { log_path_ = log_path; }
 
       void run();
 
@@ -199,7 +199,7 @@ namespace OpenMS
       MSExperiment experiment_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       MSExperiment characterization_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
-      String out_path_;
+      String log_path_;
 
       // Dialog factory
       AbstractDialogFactory* dialog_factory_;
