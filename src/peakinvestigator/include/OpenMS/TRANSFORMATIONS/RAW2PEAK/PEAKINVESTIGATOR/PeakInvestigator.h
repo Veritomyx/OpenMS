@@ -92,7 +92,6 @@ namespace OpenMS
       enum Mode
       {
         SUBMIT,
-        CHECK,
         FETCH
       };
 
