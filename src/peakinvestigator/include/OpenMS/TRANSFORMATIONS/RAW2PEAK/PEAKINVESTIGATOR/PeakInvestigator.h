@@ -110,6 +110,9 @@ namespace OpenMS
        */
       void setDialogFactory(AbstractDialogFactory* factory);
 
+      /// Get the experiment after processing.
+      MSExperiment& getExperiment() { return experiment_; }
+
       /** @brief Set the experiment for processing
      *
      * This function also makes sure the experiment being set has the correct data (i.e.
@@ -125,9 +128,6 @@ namespace OpenMS
      * @return Bool indicating whether the experiment has the correct attributes.
      */
       bool setCharacterization(MSExperiment& characterization);
-
-      /// Get the experiment after processing.
-      MSExperiment& getExperiment() { return experiment_; }
 
       /// Get the jobID, which is set after a call to initializeJob_().
       String getJobID() { return job_; }
