@@ -59,15 +59,6 @@ install(CODE "execute_process(COMMAND ${PROJECT_SOURCE_DIR}/cmake/MacOSX/fix_dep
   COMPONENT zzz-fixing-dependencies
 )
 
-## Fix PeakInvestigator SaaS
-install(CODE "execute_process(COMMAND install_name_tool -id @rpath/libPeakInvestigatorSaaS.0.dylib \${CMAKE_INSTALL_PREFIX}/${CPACK_PACKAGE_INSTALL_DIRECTORY}/lib/libPeakInvestigatorSaaS.0.dylib)"
-  COMPONENT zzzz-fix-peakinvestigator
-)
-
-install(CODE "execute_process(COMMAND install_name_tool -change @executable_path/../lib/libssh2.1.dylib @rpath/libssh2.1.dylib \${CMAKE_INSTALL_PREFIX}/${CPACK_PACKAGE_INSTALL_DIRECTORY}/lib/libPeakInvestigatorSaaS.0.dylib)"
-  COMPONENT zzzz-fix-peakinvestigator
-)
-
 ########################################################### Libraries
 # Libraries hack, avoid cmake interferring with our own lib fixes
 install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
