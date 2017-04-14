@@ -55,9 +55,6 @@ using namespace Veritomyx::PeakInvestigator;
 #define CALIB_EXT ".calib.tar"
 
 #define KEY_PI_SERVER "server"
-#define KEY_PI_USERNAME "username"
-#define KEY_PI_PASSWORD "password"
-#define KEY_PI_PROJECT "project"
 
 #define KEY_PI_MZ "m/z"
 #define KEY_PI_RTO "RTO"
@@ -77,9 +74,6 @@ namespace OpenMS
   {
     // set default parameter values
     defaults_.setValue(KEY_PI_SERVER, "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
-    defaults_.setValue(KEY_PI_USERNAME, "USERNAME", "Username for account registered with Veritomyx");
-    defaults_.setValue(KEY_PI_PASSWORD, "PASSWORD", "Password for account registered with Veritomyx");
-    defaults_.setValue(KEY_PI_PROJECT, 12345, "The project number used for the PeakInvestigator job");
 
     if (mode == "submit")
     {
@@ -580,9 +574,6 @@ namespace OpenMS
   void PeakInvestigator::updateMembers_()
   {
     server_ = param_.getValue(KEY_PI_SERVER);
-    username_ = param_.getValue(KEY_PI_USERNAME);
-    password_ = param_.getValue(KEY_PI_PASSWORD);
-    projectID_ = param_.getValue(KEY_PI_PROJECT);
 
     if (mode_ == PeakInvestigator::SUBMIT)
     {
