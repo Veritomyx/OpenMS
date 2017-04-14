@@ -105,6 +105,10 @@ protected:
     registerOutputFile_("out", "<file>", "", "output meta data file ", false);
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
+    registerStringOption_("username", "<text>", "", "username for PeakInvestigator services", true);
+    registerStringOption_("password", "<text>", "", "password for PeakInvestigator services", true);
+    registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
+
 #if WITH_GUI
     registerFlag_("gui", "Enable graphical interface dialogs");
 #endif
@@ -126,6 +130,9 @@ protected:
     in = getStringOption_("in");
     ch = getStringOption_("ch");
     out = getStringOption_("out");
+    username = getStringOption_("username");
+    password = getStringOption_("password");
+    project = getStringOption_("project");
 
 #ifdef WITH_GUI
     gui = getFlag_("gui");
@@ -161,6 +168,9 @@ protected:
     PeakInvestigator pp("submit", debug_level_);
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
+    pp.setUsername(username);
+    pp.setPassword(password);
+    pp.setProject(project);
 
 #if WITH_GUI
     if (gui)
@@ -207,6 +217,9 @@ protected:
   String in;
   String ch;
   String out;
+  String username;
+  String password;
+  String project;
 
 #if WITH_GUI
   bool gui;
