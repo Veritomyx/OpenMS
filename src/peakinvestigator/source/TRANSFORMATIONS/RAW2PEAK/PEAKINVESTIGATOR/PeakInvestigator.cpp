@@ -55,9 +55,6 @@ using namespace Veritomyx::PeakInvestigator;
 #define CALIB_EXT ".calib.tar"
 
 #define KEY_PI_SERVER "server"
-
-#define KEY_PI_MZ "m/z"
-#define KEY_PI_RTO "RTO"
 #define KEY_PI_VERSION "Version"
 
 
@@ -78,9 +75,6 @@ namespace OpenMS
     if (mode == "submit")
     {
       mode_ = PeakInvestigator::SUBMIT;
-      defaults_.setValue(KEY_PI_MZ, "[min]:[max]", "m/z range to extract (applies to ALL ms levels!");
-
-      defaults_.setValue(KEY_PI_RTO, "RTO-24", "Response Time Objective to use");
       defaults_.setValue(KEY_PI_VERSION, "select", "Version of PeakInvestigator to use");
     } else if (mode == "fetch")
     {
@@ -577,15 +571,6 @@ namespace OpenMS
 
     if (mode_ == PeakInvestigator::SUBMIT)
     {
-      String  minMaxString = param_.getValue(KEY_PI_MZ);
-      std::vector<String> minMaxSplit;
-      if((minMaxString != "[min]:[max]") && minMaxString.split(':', minMaxSplit))
-      {
-        min_mass_ = minMaxSplit[0].toInt();
-        max_mass_ = minMaxSplit[1].toInt();
-      }
-
-      RTO_ = param_.getValue(KEY_PI_RTO);
       PIVersion_ = param_.getValue(KEY_PI_VERSION);
     }
 
