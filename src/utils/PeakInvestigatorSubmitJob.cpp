@@ -157,6 +157,7 @@ protected:
     //----------------------------------------------------------------
     MSExperiment experiment;
     MzMLFile input;
+    input.setLogType(log_type_);
     input.load(in, experiment);
 
     MSExperiment characterization;
