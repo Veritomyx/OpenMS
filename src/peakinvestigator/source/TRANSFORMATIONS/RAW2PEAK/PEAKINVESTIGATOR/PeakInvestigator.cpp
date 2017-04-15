@@ -341,6 +341,8 @@ namespace OpenMS
   void PeakInvestigator::uploadScans_(SftpAction& sftp_action, const MSExperiment& experiment, const String filename)
   {
     String local_name = File::getTempDirectory() + "/" + filename;
+    LOG_DEBUG << "Using temporary file " << local_name << std::endl;
+
     saveScans_(experiment, local_name);
 
     String remote_name = sftp_action.getDirectory() + "/" + filename;
@@ -389,6 +391,7 @@ namespace OpenMS
       entryname << "scan" << std::setfill('0') << std::setw(5) << i << ".txt";
 
       MSSpectrum<Peak1D> spectrum = experiment[i];
+      data << std::setprecision(std::numeric_limits<double>::digits10 + 1);
       for(Size j = 0; j < spectrum.size(); j++)
       {
         data << spectrum[j].getMZ() << "\t" << spectrum[j].getIntensity() << "\n";
