@@ -422,6 +422,7 @@ namespace OpenMS
     {
       if (entry == "./")
       {
+        contents.clear();
         entry = file.readNextFile(contents);
         continue;
       }
@@ -438,7 +439,7 @@ namespace OpenMS
 
       int scan_num = std::stoi(match.str(1));
 
-      LOG_DEBUG << "... for scan " << scan_num << std::endl;
+      LOG_DEBUG << "... for scan " << scan_num << " , content peak: " << static_cast<char>(contents.peek()) << std::endl;
 
       MSSpectrum<Peak1D> spectrum = experiment_[scan_num];
       std::string line;
@@ -446,6 +447,7 @@ namespace OpenMS
       {
         if(line.empty() || line.at(0) == '#')
         {
+          LOG_DEBUG << "..... Skipping '" << line << "'." << std::endl;
           continue;
         }
 
@@ -453,8 +455,12 @@ namespace OpenMS
         Peak1D::IntensityType intensity, intensity_error;
         int degrees_of_freedom;
 
-        sscanf(line.c_str(), "%lf\t%f\t%lf\t%f\t%lf\t%d", &mz, &intensity, &mz_error, &intensity_error,
-               &minimum_error, &degrees_of_freedom);
+        int retval = sscanf(line.c_str(), "%lf\t%f\t%lf\t%f\t%lf\t%d", &mz, &intensity,
+                            &mz_error, &intensity_error, &minimum_error, &degrees_of_freedom);
+        if (retval != 6)
+        {
+          LOG_ERROR << "Problem parsing " << entry << ": " << line << std::endl;
+        }
 
         Peak1D peak(mz, intensity);
         spectrum.push_back(peak);
@@ -470,6 +476,7 @@ namespace OpenMS
       ProgressLogger::setProgress(progress);
       progress++;
 
+      contents.clear();
       entry = file.readNextFile(contents);
     }
 
