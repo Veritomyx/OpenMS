@@ -209,6 +209,7 @@ namespace OpenMS
       MSExperiment characterization_; ///< @brief Class used to hold spectra (raw or peak data) in memory.
       Mode mode_;
       String log_path_;
+      bool debug_;
 
       // Dialog factory
       AbstractDialogFactory* dialog_factory_;

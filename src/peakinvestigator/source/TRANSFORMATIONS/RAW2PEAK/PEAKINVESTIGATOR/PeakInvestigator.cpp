@@ -67,7 +67,8 @@ namespace OpenMS
 
   PeakInvestigator::PeakInvestigator(String mode, int debug_level) :
     DefaultParamHandler("PeakInvestigator"),
-    ProgressLogger()
+    ProgressLogger(),
+    debug_(debug_level > 0)
   {
     // set default parameter values
     defaults_.setValue(KEY_PI_SERVER, "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
@@ -92,10 +93,7 @@ namespace OpenMS
     service_ = new PeakInvestigatorSaaS(server_);
     dialog_factory_ = new ConsoleDialogFactory();
 
-    if (debug_level > 0)
-    {
-      service_->setDebug();
-    }
+    service_->setDebug(debug_);
 
 #ifdef SANDBOX
     LOG_INFO << "*** Using API sandbox. ****" << std::endl;
@@ -385,6 +383,8 @@ namespace OpenMS
     startProgress(0, experiment.size(), "Exporting scan data...");
 
     TarFile file(filename, SAVE);
+    file.setDebug(debug_);
+
     for(Size i = 0; i < experiment.size(); i++)
     {
       std::stringstream entryname, data;
