@@ -32,6 +32,7 @@
 //
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogSelector.h>
+#include <cctype>
 
 std::istream& operator>>(std::istream& is, OpenMS::ConsoleDialogSelector& selector)
 {
@@ -39,11 +40,11 @@ std::istream& operator>>(std::istream& is, OpenMS::ConsoleDialogSelector& select
   if (s) while (is.good())
   {
     char c = is.get();
-    if (std::isdigit(c, is.getloc()))
+    if (std::isdigit(c))
     {
       selector.appendCharacter(c);
     }
-    else if (std::iscntrl(c, is.getloc()) || c < 0) // seems to be terminating char for streams (testing)
+    else if (std::iscntrl(c) || c < 0) // seems to be terminating char for streams (testing)
     {
       break;
     }
