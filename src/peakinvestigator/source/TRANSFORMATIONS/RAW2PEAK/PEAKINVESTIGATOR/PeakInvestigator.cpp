@@ -90,10 +90,7 @@ namespace OpenMS
     defaultsToParam_();
     updateMembers_();
 
-    service_ = new PeakInvestigatorSaaS(server_);
     dialog_factory_ = new ConsoleDialogFactory();
-
-    service_->setDebug(debug_);
 
 #ifdef SANDBOX
     LOG_INFO << "*** Using API sandbox. ****" << std::endl;
@@ -103,7 +100,6 @@ namespace OpenMS
 
   PeakInvestigator::~PeakInvestigator()
   {
-    delete service_;
     delete dialog_factory_;
   }
 
@@ -153,6 +149,9 @@ namespace OpenMS
   void PeakInvestigator::run()
   {
 
+    service_ = new PeakInvestigatorSaaS(server_);
+    service_->setDebug(debug_);
+
     // filenames for the tar'd scans/results
     String zipfilename;
     String localFilename;
@@ -168,6 +167,7 @@ namespace OpenMS
       break;
     }
 
+    delete service_;
   }
 
   void PeakInvestigator::submit_()
