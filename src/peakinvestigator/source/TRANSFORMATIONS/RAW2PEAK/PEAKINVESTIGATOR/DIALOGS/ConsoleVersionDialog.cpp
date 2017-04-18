@@ -34,6 +34,7 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <cctype>
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogSelector.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
@@ -52,11 +53,11 @@ std::istream& operator>>(std::istream& is, Entry& entry)
   if (s) while (is.good())
   {
     char c = is.get();
-    if (std::isdigit(c, is.getloc()))
+    if (std::isdigit(c))
     {
       entry.value += c;
     }
-    else if (std::iscntrl(c, is.getloc()) || c < 0) // seems to be terminating char for streams (testing)
+    else if (std::iscntrl(c) || c < 0) // seems to be terminating char for streams (testing)
     {
       break;
     }
