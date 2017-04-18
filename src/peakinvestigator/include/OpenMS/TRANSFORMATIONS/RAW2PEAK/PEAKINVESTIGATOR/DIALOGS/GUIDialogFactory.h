@@ -39,7 +39,7 @@
 
 namespace OpenMS
 {
-  class GUIDialogFactory : public AbstractDialogFactory
+  class PEAKINVESTIGATOR_DLLAPI GUIDialogFactory : public AbstractDialogFactory
   {
     public:
       GUIDialogFactory();
