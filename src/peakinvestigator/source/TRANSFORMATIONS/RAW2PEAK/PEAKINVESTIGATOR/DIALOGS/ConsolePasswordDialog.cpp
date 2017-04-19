@@ -34,7 +34,11 @@
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsolePasswordDialog.h>
 
-#include <curses.h>
+#include <iostream>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 namespace OpenMS
 {
@@ -53,20 +57,19 @@ namespace OpenMS
     const char BACKSPACE = 8;
     const char RETURN = 10;
     const char ESCAPE = 27;
+    const char DELETE = 127;
 
     unsigned char ch = 0;
 
-    initscr();
-    printw("Password:");
-    noecho();
+    std::cout << "\nPassword: ";
 
     while((ch = get_character_()) != RETURN)
     {
-      if (ch == BACKSPACE)
+      if (ch == BACKSPACE || ch == DELETE)
       {
         if (password_.length() != 0)
         {
-          printw("\b \b");
+          std::cout << "\b \b";
           password_.resize(password_.length() - 1);
         }
       }
@@ -74,13 +77,11 @@ namespace OpenMS
       else if (ch != ESCAPE)
       {
         password_ += static_cast<char>(ch);
-        printw("*");
+        std::cout << "*";
       }
     }
 
-    echo();
-    printw("\n");
-    endwin();
+    std::cout << std::endl;
 
     return true;
   }

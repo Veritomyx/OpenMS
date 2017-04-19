@@ -37,7 +37,28 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsolePasswordDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
 
-#include <curses.h>
+#if defined(__APPLE__) || defined(__linux__)
+
+#include <termios.h>
+#include <unistd.h>
+
+int getch()
+{
+  int ch;
+  struct termios t_old, t_new;
+
+  tcgetattr(STDIN_FILENO, &t_old);
+  t_new = t_old;
+  t_new.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &t_new);
+
+  ch = getchar();
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &t_old);
+  return ch;
+}
+
+#endif
 
 namespace OpenMS
 {
@@ -56,8 +77,10 @@ namespace OpenMS
 
   AbstractPasswordDialog* ConsoleDialogFactory::getPasswordDialog()
   {
+#if defined(__APPLE__) || defined(__linux__)
     auto func = getch;
     return new ConsolePasswordDialog(func);
+#endif
   }
 
   AbstractVersionDialog* ConsoleDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)
