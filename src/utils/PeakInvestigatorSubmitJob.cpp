@@ -106,7 +106,6 @@ protected:
     setValidFormats_("out", ListUtils::create<String>("mzML"));
 
     registerStringOption_("username", "<text>", "", "username for PeakInvestigator services", true);
-    registerStringOption_("password", "<text>", "", "password for PeakInvestigator services", true);
     registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
 
 #if WITH_GUI
@@ -131,7 +130,6 @@ protected:
     ch = getStringOption_("ch");
     out = getStringOption_("out");
     username = getStringOption_("username");
-    password = getStringOption_("password");
     project = getStringOption_("project");
 
 #ifdef WITH_GUI
@@ -170,7 +168,6 @@ protected:
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
     pp.setUsername(username);
-    pp.setPassword(password);
     pp.setProject(project);
 
 #if WITH_GUI
@@ -219,7 +216,6 @@ protected:
   String ch;
   String out;
   String username;
-  String password;
   String project;
 
 #if WITH_GUI

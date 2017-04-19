@@ -103,7 +103,6 @@ protected:
     setValidFormats_("joblog", ListUtils::create<String>("txt"));
 
     registerStringOption_("username", "<text>", "", "username for PeakInvestigator services", true);
-    registerStringOption_("password", "<text>", "", "password for PeakInvestigator services", true);
     registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
 
     registerSubsection_("peakinvestigator", "PeakInvestigator account information and options");
@@ -124,7 +123,6 @@ protected:
     out = getStringOption_("out");
     log = getStringOption_("joblog");
     username = getStringOption_("username");
-    password = getStringOption_("password");
     project = getStringOption_("project");
 
     Param pi_param = getParam_().copy("peakinvestigator:", true);
@@ -142,7 +140,6 @@ protected:
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
     pp.setUsername(username);
-    pp.setPassword(password);
     pp.setProject(project);
 
     if (!pp.setExperiment(experiment))
@@ -187,7 +184,6 @@ protected:
   String out;
   String log;
   String username;
-  String password;
   String project;
 
 };
