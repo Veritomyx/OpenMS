@@ -36,19 +36,20 @@
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEPASSWORDDIALOG_H
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractPasswordDialog.h>
+#include <functional>
 
 namespace OpenMS
 {
   class PEAKINVESTIGATOR_DLLAPI ConsolePasswordDialog : public AbstractPasswordDialog
   {
     public:
-      ConsolePasswordDialog(int (*get_character)());
+      ConsolePasswordDialog(std::function<int(void)> get_character);
       ~ConsolePasswordDialog();
 
       bool exec();
 
     protected:
-      int (*get_character_)();
+      std::function<int(void)> get_character_;
   };
 }
 #endif // OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEPASSWORDDIALOG_H

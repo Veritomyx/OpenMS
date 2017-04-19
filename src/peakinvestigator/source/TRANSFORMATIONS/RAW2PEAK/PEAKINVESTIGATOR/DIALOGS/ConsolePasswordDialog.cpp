@@ -38,7 +38,7 @@
 
 namespace OpenMS
 {
-  ConsolePasswordDialog::ConsolePasswordDialog(int (*get_character)())
+  ConsolePasswordDialog::ConsolePasswordDialog(std::function<int(void)> get_character)
     : AbstractPasswordDialog()
   {
     get_character_ = get_character;
@@ -74,7 +74,7 @@ namespace OpenMS
 
       else if (ch != ESCAPE)
       {
-        password_ += ch;
+        password_ += static_cast<char>(ch);
         printw("*");
       }
     }
