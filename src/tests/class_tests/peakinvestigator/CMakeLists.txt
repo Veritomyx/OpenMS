@@ -34,6 +34,7 @@
 
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
 project("OpenMS_class_tests_peakinvestigator")
+set(CMAKE_CXX_STANDARD 11)
 
 set(PI_TEST_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/data)
 configure_file(
@@ -54,6 +55,7 @@ include_directories(SYSTEM ${OpenMS_INCLUDE_DIRECTORIES}
 set(PI_TESTS
     ConsoleVersionDialog_test
     ConsoleInitDialog_test
+    ConsolePasswordDialog_test
 )
 
 # --------------------------------------------------------------------------
