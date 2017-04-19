@@ -170,7 +170,13 @@ protected:
       out = infos[0] + "peaks.mzML";
     }
 
-    input.store(out, pp.getExperiment());
+    // Only store if job info has been removed from experiment,
+    // which should occur at the end of fetch_()
+    MSExperiment result = pp.getExperiment();
+    if(!result.metaValueExists(PeakInvestigator::META_JOB))
+    {
+      input.store(out, result);
+    }
 
     return TOPPBase::EXECUTION_OK;
 
