@@ -141,9 +141,6 @@ namespace OpenMS
       /// Set the username
       void setUsername(const String& username) { username_ = username; }
 
-      /// Set the password
-      void setPassword(const String& password) { password_ = password; }
-
       /// Set the project
       void setProject(const String& projectID) { projectID_ = projectID.toInt(); }
 

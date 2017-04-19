@@ -48,6 +48,7 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogFactory.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractInitDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractPasswordDialog.h>
 
 using namespace Veritomyx::PeakInvestigator;
 
@@ -156,6 +157,14 @@ namespace OpenMS
 
     service_ = new PeakInvestigatorSaaS(server_);
     service_->setDebug(debug_);
+
+    AbstractPasswordDialog* password_dialog = dialog_factory_->getPasswordDialog();
+    if(!password_dialog->exec())
+    {
+      return;
+    }
+
+    password_ = password_dialog->getPassword();
 
     // filenames for the tar'd scans/results
     String zipfilename;

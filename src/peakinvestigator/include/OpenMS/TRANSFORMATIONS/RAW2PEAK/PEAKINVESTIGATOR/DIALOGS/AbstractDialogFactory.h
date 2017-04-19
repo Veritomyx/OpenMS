@@ -45,6 +45,7 @@ using Veritomyx::PeakInvestigator::EstimatedCosts;
 namespace OpenMS
 {
   class AbstractInitDialog;
+  class AbstractPasswordDialog;
   class AbstractVersionDialog;
 
   class PEAKINVESTIGATOR_DLLAPI AbstractDialogFactory
@@ -55,6 +56,7 @@ namespace OpenMS
       virtual ~AbstractDialogFactory() {}
 
       virtual AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds) = 0;
+      virtual AbstractPasswordDialog* getPasswordDialog() = 0;
       virtual AbstractVersionDialog* getVersionDialog(String title, std::list<std::string> versions, String current, String previous) = 0;
   };
 }

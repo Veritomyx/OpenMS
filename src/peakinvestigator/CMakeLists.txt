@@ -1,5 +1,6 @@
 project(PeakInvestigator)
 option(WITH_PEAKINVESTIGATOR "Build PeakInvestigator library and applications." ON)
+set(CMAKE_CXX_STANDARD 11)
 
 if(WITH_PEAKINVESTIGATOR)
     find_package(PeakInvestigatorSaaS REQUIRED)

@@ -34,7 +34,10 @@
 
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogFactory.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleInitDialog.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsolePasswordDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
+
+#include <curses.h>
 
 namespace OpenMS
 {
@@ -49,6 +52,12 @@ namespace OpenMS
   AbstractInitDialog* ConsoleDialogFactory::getInitDialog(String title, EstimatedCosts costs, double funds)
   {
     return new ConsoleInitDialog(title, costs, funds);
+  }
+
+  AbstractPasswordDialog* ConsoleDialogFactory::getPasswordDialog()
+  {
+    auto func = getch;
+    return new ConsolePasswordDialog(func);
   }
 
   AbstractVersionDialog* ConsoleDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)

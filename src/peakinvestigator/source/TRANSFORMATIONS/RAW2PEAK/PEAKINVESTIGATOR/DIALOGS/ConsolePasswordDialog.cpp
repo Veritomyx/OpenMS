@@ -42,12 +42,10 @@ namespace OpenMS
     : AbstractPasswordDialog()
   {
     get_character_ = get_character;
-    initscr();
   }
 
   ConsolePasswordDialog::~ConsolePasswordDialog()
   {
-    endwin();
   }
 
   bool ConsolePasswordDialog::exec()
@@ -58,6 +56,7 @@ namespace OpenMS
 
     unsigned char ch = 0;
 
+    initscr();
     printw("Password:");
     noecho();
 
@@ -81,6 +80,7 @@ namespace OpenMS
 
     echo();
     printw("\n");
+    endwin();
 
     return true;
   }
