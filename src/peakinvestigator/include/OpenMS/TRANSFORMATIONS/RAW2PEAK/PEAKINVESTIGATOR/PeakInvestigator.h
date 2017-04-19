@@ -176,6 +176,7 @@ namespace OpenMS
       void loadScans_(String filename);
 
       /* Misc methods. */
+      String getPassword_();
       SftpAction getSftpInfo_();
       void deleteJob_();
       bool validateExperiment_(MSExperiment& experiment);

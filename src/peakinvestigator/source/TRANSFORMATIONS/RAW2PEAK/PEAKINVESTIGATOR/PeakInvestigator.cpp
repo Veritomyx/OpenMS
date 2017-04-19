@@ -158,13 +158,11 @@ namespace OpenMS
     service_ = new PeakInvestigatorSaaS(server_);
     service_->setDebug(debug_);
 
-    AbstractPasswordDialog* password_dialog = dialog_factory_->getPasswordDialog();
-    if(!password_dialog->exec())
+    password_ = getPassword_();
+    if (password_ == "")
     {
       return;
     }
-
-    password_ = password_dialog->getPassword();
 
     // filenames for the tar'd scans/results
     String zipfilename;
@@ -495,6 +493,40 @@ namespace OpenMS
     }
 
     endProgress();
+  }
+
+  String PeakInvestigator::getPassword_()
+  {
+    String password;
+
+    while(true)
+    {
+      AbstractPasswordDialog* password_dialog = dialog_factory_->getPasswordDialog();
+      if(!password_dialog->exec())
+      {
+        return "";
+      }
+
+      password = password_dialog->getPassword();
+      delete password_dialog;
+
+      PiVersionsAction action(username_, password);
+      std::string response = service_->executeAction(&action);
+      action.processResponse(response);
+
+      if(!action.hasError())
+      {
+        break;
+      } else if (action.getErrorCode() != 3)
+      {
+        throw Exception::FailedAPICall(__FILE__, __LINE__, "PeakInvestigator::getPassword_()",
+                                       action.getErrorMessage());
+      }
+
+      std::cout << "Incorrect password. Please try again." << std::endl;
+    }
+
+    return password;
   }
 
   SftpAction PeakInvestigator::getSftpInfo_()
