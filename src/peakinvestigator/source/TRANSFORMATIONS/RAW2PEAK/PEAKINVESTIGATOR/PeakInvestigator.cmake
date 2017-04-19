@@ -69,6 +69,7 @@ if(WITH_GUI)
 
     set(ui_sources
         GUIInitDialog.ui
+        GUIPasswordDialog.ui
         GUIVersionDialog.ui
     )
 
@@ -82,12 +83,14 @@ if(WITH_GUI)
     list(APPEND PI_HEADERS
         DIALOGS/GUIDialogFactory.h
         DIALOGS/GUIInitDialog.h
+        DIALOGS/GUIPasswordDialog.h
         DIALOGS/GUIVersionDialog.h
     )
 
     list(APPEND PI_SOURCES
         DIALOGS/GUIDialogFactory.cpp
         DIALOGS/GUIInitDialog.cpp
+        DIALOGS/GUIPasswordDialog.cpp
         DIALOGS/GUIVersionDialog.cpp
     )
 
@@ -97,6 +100,7 @@ if(WITH_GUI)
 
     set(moc_sources
         ${PI_HEADER_DIR}/DIALOGS/GUIInitDialog.h
+        ${PI_HEADER_DIR}/DIALOGS/GUIPasswordDialog.h
         ${PI_HEADER_DIR}/DIALOGS/GUIVersionDialog.h
     )
 

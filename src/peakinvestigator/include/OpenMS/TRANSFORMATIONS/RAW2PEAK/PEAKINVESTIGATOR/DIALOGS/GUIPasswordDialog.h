@@ -2,7 +2,7 @@
 //                   OpenMS -- Open-Source Mass Spectrometry
 // --------------------------------------------------------------------------
 // Copyright The OpenMS Team -- Eberhard Karls University Tuebingen,
-// ETH Zurich, and Freie Universitaet Berlin 2016.
+// ETH Zurich, and Freie Universitaet Berlin 2017.
 //
 // This software is released under a three-clause BSD license:
 //  * Redistributions of source code must retain the above copyright
@@ -32,35 +32,34 @@
 // $Author: Adam Tenderholt $
 // --------------------------------------------------------------------------
 
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIDialogFactory.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIInitDialog.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIPasswordDialog.h>
-#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
+#ifndef OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIPASSWORDDIALOG_H
+#define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIPASSWORDDIALOG_H
 
-#include <curses.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractPasswordDialog.h>
+
+#include <QDialog>
+
+namespace Ui
+{
+  class PasswordDialog;
+}
 
 namespace OpenMS
 {
-  GUIDialogFactory::GUIDialogFactory() : AbstractDialogFactory()
+  class PEAKINVESTIGATOR_DLLAPI GUIPasswordDialog : public QDialog, public AbstractPasswordDialog
   {
-  }
+      Q_OBJECT
 
-  GUIDialogFactory::~GUIDialogFactory()
-  {
-  }
+    public:
+      GUIPasswordDialog();
+      ~GUIPasswordDialog();
 
-  AbstractInitDialog* GUIDialogFactory::getInitDialog(String title, EstimatedCosts costs, double funds)
-  {
-    return new GUIInitDialog(title, costs, funds);
-  }
+      bool exec();
 
-  AbstractPasswordDialog* GUIDialogFactory::getPasswordDialog()
-  {
-    return new GUIPasswordDialog();
-  }
-
-  AbstractVersionDialog* GUIDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)
-  {
-    return new GUIVersionDialog(title, versions, current, previous);
-  }
+    private:
+      Ui::PasswordDialog* ui_;
+  };
 }
+
+#endif // OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_GUIPASSWORDDIALOG_H
