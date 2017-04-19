@@ -43,6 +43,8 @@ set(PI_HEADERS
     DIALOGS/ConsoleDialogFactory.h
     DIALOGS/AbstractInitDialog.h
     DIALOGS/ConsoleInitDialog.h
+    DIALOGS/AbstractPasswordDialog.h
+    DIALOGS/ConsolePasswordDialog.h
     DIALOGS/AbstractVersionDialog.h
     DIALOGS/ConsoleVersionDialog.h
     DIALOGS/ConsoleDialogSelector.h
@@ -52,6 +54,7 @@ set(PI_SOURCES
     PeakInvestigator.cpp
     DIALOGS/ConsoleDialogFactory.cpp
     DIALOGS/ConsoleInitDialog.cpp
+    DIALOGS/ConsolePasswordDialog.cpp
     DIALOGS/ConsoleVersionDialog.cpp
     DIALOGS/ConsoleDialogSelector.cpp
 )
