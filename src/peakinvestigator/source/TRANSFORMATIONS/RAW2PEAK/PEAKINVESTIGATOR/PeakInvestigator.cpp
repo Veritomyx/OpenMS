@@ -70,6 +70,15 @@ namespace OpenMS
     ProgressLogger(),
     debug_(debug_level > 0)
   {
+
+#ifdef SANDBOX
+    LOG_INFO << "*** Using API sandbox. ****" << std::endl;
+    defaults_.setValue("sandbox:init", 0, "Sandbox value for INIT call");
+    defaults_.setValue("sandbox:run", 0, "Sandbox value for RUN call");
+    defaults_.setValue("sandbox:status", "Done", "Sandbox value for STATUS call");
+    defaults_.setValue("sandbox:delete", 0, "Sandbox value for DELETE call");
+#endif
+
     // set default parameter values
     defaults_.setValue(KEY_PI_SERVER, "peakinvestigator.veritomyx.com", "Server address for PeakInvestigator (without https://)");
 
@@ -91,10 +100,6 @@ namespace OpenMS
     updateMembers_();
 
     dialog_factory_ = new ConsoleDialogFactory();
-
-#ifdef SANDBOX
-    LOG_INFO << "*** Using API sandbox. ****" << std::endl;
-#endif
 
   }
 
@@ -204,7 +209,7 @@ namespace OpenMS
     StatusAction action(username_, password_, job_);
 
 #ifdef SANDBOX
-    SandboxAction* sandbox = new SandboxAction(&action, "Done");
+    SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:status").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
 #else
@@ -301,7 +306,7 @@ namespace OpenMS
     LOG_DEBUG << "action.buildQuery(): " << action.buildQuery() << std::endl;
 
 #ifdef SANDBOX
-    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:init").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
 #else
@@ -352,7 +357,7 @@ namespace OpenMS
     RunAction action(username_, password_, job, RTO, filename, calib_filename);
 
 #ifdef SANDBOX
-    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:run").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
 #else
@@ -504,7 +509,7 @@ namespace OpenMS
     DeleteAction action(username_, password_, job_);
 
 #ifdef SANDBOX
-    SandboxAction* sandbox = new SandboxAction(&action, 0);
+    SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:delete").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
 #else
