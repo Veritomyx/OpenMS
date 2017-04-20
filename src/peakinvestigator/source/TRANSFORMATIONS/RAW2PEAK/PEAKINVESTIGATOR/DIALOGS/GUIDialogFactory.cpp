@@ -37,8 +37,6 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIPasswordDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
 
-#include <curses.h>
-
 namespace OpenMS
 {
   GUIDialogFactory::GUIDialogFactory() : AbstractDialogFactory()

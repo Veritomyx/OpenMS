@@ -54,18 +54,18 @@ namespace OpenMS
 
   bool ConsolePasswordDialog::exec()
   {
-    const char BACKSPACE = 8;
-    const char RETURN = 10;
-    const char ESCAPE = 27;
-    const char DELETE = 127;
+    const char BACKSPACE_CODE = 8;
+    const char RETURN_CODE = 10;
+    const char ESCAPE_CODE = 27;
+    const char DELETE_CODE = 127;
 
     unsigned char ch = 0;
 
     std::cout << "\nPassword: ";
 
-    while((ch = get_character_()) != RETURN)
+    while((ch = get_character_()) != RETURN_CODE)
     {
-      if (ch == BACKSPACE || ch == DELETE)
+      if (ch == BACKSPACE_CODE || ch == DELETE_CODE)
       {
         if (password_.length() != 0)
         {
@@ -74,7 +74,7 @@ namespace OpenMS
         }
       }
 
-      else if (ch != ESCAPE)
+      else if (ch != ESCAPE_CODE)
       {
         password_ += static_cast<char>(ch);
         std::cout << "*";
