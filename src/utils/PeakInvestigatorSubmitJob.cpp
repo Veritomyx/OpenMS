@@ -81,14 +81,18 @@ public:
   TOPPPeakInvestigatorSubmitJob() :
     TOPPBase("PeakInvestigatorSubmitJob",
                 "Submit a job to the PeakInvestigator(R) centroiding and deconvolution software service.",
-                false)
+                false),
+    gui(false)
   {
   }
 
   ~TOPPPeakInvestigatorSubmitJob()
   {
 #if WITH_GUI
-    delete app;
+    if(gui)
+    {
+      delete app;
+    }
 #endif
   }
 
