@@ -57,6 +57,9 @@ namespace OpenMS
 
       bool exec();
 
+    public slots:
+      void on_lineEdit_textChanged(const QString& text);
+
     private:
       Ui::PasswordDialog* ui_;
   };

@@ -53,4 +53,9 @@ namespace OpenMS
     int retval = QDialog::exec();
     return retval == QDialog::Accepted;
   }
+
+  void GUIPasswordDialog::on_lineEdit_textChanged(const QString &text)
+  {
+    password_ = text;
+  }
 }

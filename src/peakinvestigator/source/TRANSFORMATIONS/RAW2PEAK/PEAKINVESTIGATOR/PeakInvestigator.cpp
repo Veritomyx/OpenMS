@@ -510,6 +510,8 @@ namespace OpenMS
       password = password_dialog->getPassword();
       delete password_dialog;
 
+      LOG_DEBUG << "Trying password: " << password << std::endl;
+
       PiVersionsAction action(username_, password);
       std::string response = service_->executeAction(&action);
       action.processResponse(response);
