@@ -40,13 +40,6 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIDialogFactory.h>
 #endif
 
-//#ifdef WITH_GUI
-//#include <QApplication>
-//#else
-//#include <QtCore/QCoreApplication>
-//#endif
-//#include <QtCore/QTimer>
-
 using namespace OpenMS;
 
 //-------------------------------------------------------------
@@ -81,12 +74,19 @@ public:
   TOPPPeakInvestigatorFetchResults() :
     TOPPBase("PeakInvestigatorFetchResults",
                 "Fetch results from the PeakInvestigator(R) centroiding and deconvolution software service.",
-                false)
+                false),
+    gui(false)
   {
   }
 
   ~TOPPPeakInvestigatorFetchResults()
   {
+#if WITH_GUI
+    if(gui)
+    {
+      delete app;
+    }
+#endif
   }
 
 protected:
@@ -105,6 +105,10 @@ protected:
     registerStringOption_("username", "<text>", "", "username for PeakInvestigator services", true);
     registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
 
+#if WITH_GUI
+    registerFlag_("gui", "Enable graphical interface dialogs");
+#endif
+
     registerSubsection_("peakinvestigator", "PeakInvestigator account information and options");
   }
 
@@ -113,7 +117,7 @@ protected:
     return PeakInvestigator("fetch").getDefaults();
   }
 
-  ExitCodes main_(int /* argc */, const char ** /* argv */)
+  ExitCodes main_(int argc, const char ** argv)
   {
     //-------------------------------------------------------------
     // parameter handling
@@ -125,8 +129,23 @@ protected:
     username = getStringOption_("username");
     project = getStringOption_("project");
 
+#ifdef WITH_GUI
+    gui = getFlag_("gui");
+#endif
+
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
+
+    //-------------------------------------------------------------
+    // Setup a QApplication for GUI options
+    //-------------------------------------------------------------
+#if WITH_GUI
+    if (gui)
+    {
+      char** argv2 = const_cast<char**>(argv);
+      app = new QApplication(argc, argv2);
+    }
+#endif
 
     //----------------------------------------------------------------
     // Open file
@@ -141,6 +160,13 @@ protected:
     pp.setParameters(pi_param);
     pp.setUsername(username);
     pp.setProject(project);
+
+#if WITH_GUI
+    if (gui)
+    {
+      pp.setDialogFactory(new GUIDialogFactory());
+    }
+#endif
 
     if (!pp.setExperiment(experiment))
     {
@@ -185,6 +211,11 @@ protected:
   String log;
   String username;
   String project;
+
+#if WITH_GUI
+  bool gui;
+  QApplication* app;
+#endif
 
 };
 
