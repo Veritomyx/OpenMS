@@ -308,7 +308,7 @@ namespace OpenMS
   InitAction PeakInvestigator::initializeJob_(String version)
   {
     JobAttributes attributes = PeakInvestigator::getJobAttributes(experiment_);
-    InitAction action = InitAction(username_, password_, projectID_, version, experiment_.size(), attributes, characterization_.size());
+    InitAction action(username_, password_, projectID_, version, experiment_.size(), attributes, characterization_.size());
 
     LOG_DEBUG << "action.buildQuery(): " << action.buildQuery() << std::endl;
 
