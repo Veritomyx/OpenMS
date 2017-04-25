@@ -46,7 +46,7 @@ namespace OpenMS
       ~GUIDialogFactory();
 
       AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds);
-      AbstractPasswordDialog* getPasswordDialog();
+      AbstractPasswordDialog* getPasswordDialog(String username);
       AbstractVersionDialog* getVersionDialog(String title, std::list<std::string> versions, String current, String previous);
   };
 }

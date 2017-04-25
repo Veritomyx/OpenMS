@@ -52,9 +52,9 @@ namespace OpenMS
     return new GUIInitDialog(title, costs, funds);
   }
 
-  AbstractPasswordDialog* GUIDialogFactory::getPasswordDialog()
+  AbstractPasswordDialog* GUIDialogFactory::getPasswordDialog(String username)
   {
-    return new GUIPasswordDialog();
+    return new GUIPasswordDialog(username);
   }
 
   AbstractVersionDialog* GUIDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)

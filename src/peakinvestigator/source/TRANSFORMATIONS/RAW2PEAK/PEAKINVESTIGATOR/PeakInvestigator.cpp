@@ -502,7 +502,7 @@ namespace OpenMS
 
     while(true)
     {
-      AbstractPasswordDialog* password_dialog = dialog_factory_->getPasswordDialog();
+      AbstractPasswordDialog* password_dialog = dialog_factory_->getPasswordDialog(username_);
       if(!password_dialog->exec())
       {
         return "";

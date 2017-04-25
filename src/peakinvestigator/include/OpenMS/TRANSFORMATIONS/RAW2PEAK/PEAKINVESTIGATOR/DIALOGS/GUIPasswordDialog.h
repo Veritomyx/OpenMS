@@ -52,7 +52,7 @@ namespace OpenMS
       Q_OBJECT
 
     public:
-      GUIPasswordDialog();
+      GUIPasswordDialog(String username);
       ~GUIPasswordDialog();
 
       bool exec();

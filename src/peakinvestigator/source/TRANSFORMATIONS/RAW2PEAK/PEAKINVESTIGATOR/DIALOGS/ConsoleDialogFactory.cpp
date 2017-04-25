@@ -75,7 +75,7 @@ namespace OpenMS
     return new ConsoleInitDialog(title, costs, funds);
   }
 
-  AbstractPasswordDialog* ConsoleDialogFactory::getPasswordDialog()
+  AbstractPasswordDialog* ConsoleDialogFactory::getPasswordDialog(String username)
   {
 #if defined(__APPLE__) || defined(__linux__)
     auto func = getch;

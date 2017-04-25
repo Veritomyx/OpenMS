@@ -37,10 +37,12 @@
 
 namespace OpenMS
 {
-  GUIPasswordDialog::GUIPasswordDialog()
-    : ui_(new Ui::PasswordDialog())
+  GUIPasswordDialog::GUIPasswordDialog(String username)
+    : QDialog(),
+      ui_(new Ui::PasswordDialog())
   {
     ui_->setupUi(this);
+    ui_->usernameText->setText(username.toQString());
   }
 
   GUIPasswordDialog::~GUIPasswordDialog()
