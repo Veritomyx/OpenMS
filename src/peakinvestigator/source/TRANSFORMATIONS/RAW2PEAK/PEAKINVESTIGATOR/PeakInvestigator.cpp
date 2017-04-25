@@ -319,7 +319,8 @@ namespace OpenMS
 #else
     String response = service_->executeAction(&action);
 #endif
-    action.processResponse(response);
+	LOG_DEBUG << "... Response: '" << response << "'." << std::endl;
+	action.processResponse(response);
 
 
     if(action.hasError())
