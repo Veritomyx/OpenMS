@@ -37,6 +37,8 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsolePasswordDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleVersionDialog.h>
 
+#include <iostream>
+
 #if defined(__APPLE__) || defined(__linux__)
 
 #include <termios.h>
@@ -60,6 +62,19 @@ int getch()
 
 #endif
 
+#if defined(_WIN32)
+
+int getChar()
+{
+	DWORD dwRead;
+	unsigned char ch = 0;
+
+	ReadConsole(OpenMS::ConsolePasswordDialog::hIn, &ch, 1, &dwRead, NULL);
+	return static_cast<int>(ch);
+}
+
+#endif
+
 namespace OpenMS
 {
   ConsoleDialogFactory::ConsoleDialogFactory() : AbstractDialogFactory()
@@ -79,8 +94,11 @@ namespace OpenMS
   {
 #if defined(__APPLE__) || defined(__linux__)
     auto func = getch;
-    return new ConsolePasswordDialog(func);
 #endif
+#if defined(_WIN32)
+	auto func = getChar;
+#endif
+	return new ConsolePasswordDialog(func);
   }
 
   AbstractVersionDialog* ConsoleDialogFactory::getVersionDialog(String title, std::list<std::string> versions, String current, String previous)

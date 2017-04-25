@@ -42,20 +42,36 @@
 
 namespace OpenMS
 {
+  HANDLE ConsolePasswordDialog::hIn = GetStdHandle(STD_INPUT_HANDLE);
+
   ConsolePasswordDialog::ConsolePasswordDialog(std::function<int(void)> get_character)
     : AbstractPasswordDialog()
   {
     get_character_ = get_character;
+
+#if defined(_WIN32)
+	GetConsoleMode(hIn, &console_mode);
+	SetConsoleMode(hIn, console_mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT));
+#endif
   }
 
   ConsolePasswordDialog::~ConsolePasswordDialog()
   {
+#if defined(_WIN32)
+	  SetConsoleMode(hIn, console_mode);
+#endif
   }
 
   bool ConsolePasswordDialog::exec()
   {
     const char BACKSPACE_CODE = 8;
+#if defined(__APPLE__) || defined(__linux__)
     const char RETURN_CODE = 10;
+#endif
+#if defined(_WIN32)
+	const char RETURN_CODE = 13;
+#endif
+
     const char ESCAPE_CODE = 27;
     const char DELETE_CODE = 127;
 
