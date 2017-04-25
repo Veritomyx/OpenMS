@@ -42,7 +42,9 @@
 
 namespace OpenMS
 {
+#if defined(_WIN32)
   HANDLE ConsolePasswordDialog::hIn = GetStdHandle(STD_INPUT_HANDLE);
+#endif
 
   ConsolePasswordDialog::ConsolePasswordDialog(std::function<int(void)> get_character)
     : AbstractPasswordDialog()
