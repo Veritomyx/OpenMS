@@ -147,8 +147,8 @@ namespace OpenMS
       void run();
 
       /* Methods for displaying SFTP progress */
-      void initialize(const int total, const std::string label);
-      void setProgress(const int progress);
+      void initialize(const long long total, const std::string label);
+      void setProgress(const long long progress);
       void finish();
 
       /// Utility function to determine job attributes in an experiment

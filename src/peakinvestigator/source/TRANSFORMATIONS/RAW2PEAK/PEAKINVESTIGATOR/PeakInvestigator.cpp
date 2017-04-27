@@ -115,12 +115,12 @@ namespace OpenMS
     dialog_factory_ = factory;
   }
 
-  void PeakInvestigator::initialize(const int total, const std::string label)
+  void PeakInvestigator::initialize(const long long total, const std::string label)
   {
     startProgress(0, total, label);
   }
 
-  void PeakInvestigator::setProgress(const int progress)
+  void PeakInvestigator::setProgress(const long long progress)
   {
     ProgressLogger::setProgress(progress);
   }
