@@ -44,7 +44,9 @@
 #include <PeakInvestigator/Actions/SandboxAction.h>
 
 #include <OpenMS/FORMAT/PeakTypeEstimator.h>
+
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorSandbox.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogFactory.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractVersionDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/AbstractInitDialog.h>
@@ -58,9 +60,6 @@ using namespace Veritomyx::PeakInvestigator;
 #define KEY_PI_SERVER "server"
 #define KEY_PI_VERSION "Version"
 
-
-#define SANDBOX 1
-
 namespace OpenMS
 {
   const std::string PeakInvestigator::META_JOB("peakinvestigator:job");
@@ -72,7 +71,7 @@ namespace OpenMS
     debug_(debug_level > 0)
   {
 
-#ifdef SANDBOX
+#ifdef PEAKINVESTIGATOR_SANDBOX
     LOG_INFO << "*** Using API sandbox. ****" << std::endl;
     defaults_.setValue("sandbox:init", 0, "Sandbox value for INIT call");
     defaults_.setValue("sandbox:run", 0, "Sandbox value for RUN call");
@@ -215,7 +214,7 @@ namespace OpenMS
 
     StatusAction action(username_, password_, job_);
 
-#ifdef SANDBOX
+#ifdef PEAKINVESTIGATOR_SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:status").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -312,7 +311,7 @@ namespace OpenMS
 
     LOG_DEBUG << "action.buildQuery(): " << action.buildQuery() << std::endl;
 
-#ifdef SANDBOX
+#ifdef PEAKINVESTIGATOR_SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:init").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -364,7 +363,7 @@ namespace OpenMS
   {
     RunAction action(username_, password_, job, RTO, filename, calib_filename);
 
-#ifdef SANDBOX
+#ifdef PEAKINVESTIGATOR_SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:run").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;
@@ -552,7 +551,7 @@ namespace OpenMS
 
     DeleteAction action(username_, password_, job_);
 
-#ifdef SANDBOX
+#ifdef PEAKINVESTIGATOR_SANDBOX
     SandboxAction* sandbox = new SandboxAction(&action, param_.getValue("sandbox:delete").toString());
     String response = service_->executeAction(sandbox);
     delete sandbox;

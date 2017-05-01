@@ -32,10 +32,16 @@
 # $Authors: Adam Tenderholt$
 # --------------------------------------------------------------------------
 
+option(PEAKINVESTIGATOR_SANDBOX "Use PeakInvestigator API sandbox (for development)." OFF)
+
 ### the directory names
 set(PI_HEADER_DIR include/OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR)
 set(PI_SOURCE_DIR source/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR)
 
+configure_file(
+    ${CMAKE_SOURCE_DIR}/src/peakinvestigator/${PI_HEADER_DIR}/PeakInvestigatorSandbox.h.in
+    ${CMAKE_BINARY_DIR}/src/peakinvestigator/${PI_HEADER_DIR}/PeakInvestigatorSandbox.h
+)
 
 set(PI_HEADERS
     PeakInvestigator.h
