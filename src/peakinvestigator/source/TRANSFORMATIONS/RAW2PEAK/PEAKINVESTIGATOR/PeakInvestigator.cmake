@@ -105,7 +105,6 @@ if(WITH_GUI)
     )
 
     qt4_wrap_cpp(PI_MOC_SOURCES ${moc_sources})
-    message("PI moc: ${PI_MOC_SOURCES}")
 
 #    list(APPEND PI_HEADERS
 #        DIALOGS/GUIDialogFactory.h
