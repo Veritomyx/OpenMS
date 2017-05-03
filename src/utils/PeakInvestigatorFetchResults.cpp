@@ -100,7 +100,7 @@ protected:
     registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
 
 #if WITH_GUI
-    registerFlag_("gui", "Enable graphical interface dialogs");
+    registerFlag_("console", "Use the console for dialogs");
 #endif
 
     registerSubsection_("peakinvestigator", "PeakInvestigator account information and options");
@@ -135,8 +135,8 @@ protected:
     input.load(in, experiment);
 
 #if WITH_GUI
-    AbstractDialogFactory* factory = getFlag_("gui") ? static_cast<AbstractDialogFactory*>(new GUIDialogFactory(argc, argv))
-                                                   : static_cast<AbstractDialogFactory*>(new ConsoleDialogFactory(argc, argv));
+    AbstractDialogFactory* factory = getFlag_("console") ? static_cast<AbstractDialogFactory*>(new ConsoleDialogFactory(argc, argv))
+                                                         : static_cast<AbstractDialogFactory*>(new GUIDialogFactory(argc, argv));
     PeakInvestigator pp("fetch", debug_level_, factory);
 #else
     PeakInvestigator pp("fetch", debug_level_, new ConsoleDialogFactory(argc, argv));
