@@ -37,14 +37,19 @@
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIPasswordDialog.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/GUIVersionDialog.h>
 
+#include <QApplication>
+
 namespace OpenMS
 {
-  GUIDialogFactory::GUIDialogFactory() : AbstractDialogFactory()
+  GUIDialogFactory::GUIDialogFactory(int argc, const char** argv) : AbstractDialogFactory(argc, argv)
   {
+    char** argv2 = const_cast<char**>(argv);
+    app_ = new QApplication(argc, argv2);
   }
 
   GUIDialogFactory::~GUIDialogFactory()
   {
+    delete app_;
   }
 
   AbstractInitDialog* GUIDialogFactory::getInitDialog(String title, EstimatedCosts costs, double funds)

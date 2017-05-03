@@ -77,7 +77,7 @@ int getChar()
 
 namespace OpenMS
 {
-  ConsoleDialogFactory::ConsoleDialogFactory() : AbstractDialogFactory()
+  ConsoleDialogFactory::ConsoleDialogFactory(int argc, const char** argv) : AbstractDialogFactory(argc, argv)
   {
   }
 

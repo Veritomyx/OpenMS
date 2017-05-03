@@ -99,7 +99,7 @@ namespace OpenMS
       static const std::string META_VERSION;
 
       /// Constructor
-      PeakInvestigator(String mode, int debug_level = 0);
+      PeakInvestigator(String mode, int debug_level, AbstractDialogFactory *dialog_factory);
 
       /// Destructor
       virtual ~PeakInvestigator();

@@ -37,17 +37,22 @@
 
 #include "AbstractDialogFactory.h"
 
+class QApplication;
+
 namespace OpenMS
 {
   class PEAKINVESTIGATOR_DLLAPI GUIDialogFactory : public AbstractDialogFactory
   {
     public:
-      GUIDialogFactory();
+      GUIDialogFactory(int argc, const char** argv);
       ~GUIDialogFactory();
 
       AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds);
       AbstractPasswordDialog* getPasswordDialog(String username);
       AbstractVersionDialog* getVersionDialog(String title, std::list<std::string> versions, String current, String previous);
+
+    private:
+      QApplication* app_;
   };
 }
 

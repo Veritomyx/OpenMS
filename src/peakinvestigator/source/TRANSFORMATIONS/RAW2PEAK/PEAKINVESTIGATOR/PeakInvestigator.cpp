@@ -65,10 +65,11 @@ namespace OpenMS
   const std::string PeakInvestigator::META_JOB("peakinvestigator:job");
   const std::string PeakInvestigator::META_VERSION("peakinvestigator:version");
 
-  PeakInvestigator::PeakInvestigator(String mode, int debug_level) :
+  PeakInvestigator::PeakInvestigator(String mode, int debug_level, AbstractDialogFactory* dialog_factory) :
     DefaultParamHandler("PeakInvestigator"),
     ProgressLogger(),
-    debug_(debug_level > 0)
+    debug_(debug_level > 0),
+    dialog_factory_(dialog_factory)
   {
 
 #ifdef PEAKINVESTIGATOR_SANDBOX
@@ -98,9 +99,6 @@ namespace OpenMS
     // write defaults into Param object param_
     defaultsToParam_();
     updateMembers_();
-
-    dialog_factory_ = new ConsoleDialogFactory();
-
   }
 
   PeakInvestigator::~PeakInvestigator()

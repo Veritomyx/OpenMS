@@ -42,7 +42,7 @@ namespace OpenMS
   class ConsoleDialogFactory : public AbstractDialogFactory
   {
     public:
-      ConsoleDialogFactory();
+      ConsoleDialogFactory(int argc, const char** argv);
       ~ConsoleDialogFactory();
 
       AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds);

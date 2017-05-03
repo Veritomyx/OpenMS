@@ -52,7 +52,7 @@ namespace OpenMS
   {
     public:
 
-      AbstractDialogFactory() {}
+      AbstractDialogFactory(int /* argc */, const char** /* argv */) {}
       virtual ~AbstractDialogFactory() {}
 
       virtual AbstractInitDialog* getInitDialog(String title, EstimatedCosts costs, double funds) = 0;

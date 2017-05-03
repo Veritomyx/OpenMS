@@ -34,6 +34,7 @@
 
 #include <OpenMS/APPLICATIONS/TOPPBase.h>
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigator.h>
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/DIALOGS/ConsoleDialogFactory.h>
 
 #ifdef WITH_GUI
 #include <QApplication>
@@ -74,19 +75,12 @@ public:
   TOPPPeakInvestigatorFetchResults() :
     TOPPBase("PeakInvestigatorFetchResults",
                 "Fetch results from the PeakInvestigator(R) centroiding and deconvolution software service.",
-                false),
-    gui(false)
+                false)
   {
   }
 
   ~TOPPPeakInvestigatorFetchResults()
   {
-#if WITH_GUI
-    if(gui)
-    {
-      delete app;
-    }
-#endif
   }
 
 protected:
@@ -114,7 +108,7 @@ protected:
 
   Param getSubsectionDefaults_(const String & /*section*/) const
   {
-    return PeakInvestigator("fetch").getDefaults();
+    return PeakInvestigator("fetch", 0, new ConsoleDialogFactory(0, NULL)).getDefaults();
   }
 
   ExitCodes main_(int argc, const char ** argv)
@@ -129,23 +123,8 @@ protected:
     username = getStringOption_("username");
     project = getStringOption_("project");
 
-#ifdef WITH_GUI
-    gui = getFlag_("gui");
-#endif
-
     Param pi_param = getParam_().copy("peakinvestigator:", true);
     writeDebug_("Parameters passed to PeakInvestigator", pi_param, 3);
-
-    //-------------------------------------------------------------
-    // Setup a QApplication for GUI options
-    //-------------------------------------------------------------
-#if WITH_GUI
-    if (gui)
-    {
-      char** argv2 = const_cast<char**>(argv);
-      app = new QApplication(argc, argv2);
-    }
-#endif
 
     //----------------------------------------------------------------
     // Open file
@@ -155,18 +134,18 @@ protected:
     input.setLogType(log_type_);
     input.load(in, experiment);
 
-    PeakInvestigator pp("fetch", debug_level_);
+#if WITH_GUI
+    AbstractDialogFactory* factory = getFlag_("gui") ? static_cast<AbstractDialogFactory*>(new GUIDialogFactory(argc, argv))
+                                                   : static_cast<AbstractDialogFactory*>(new ConsoleDialogFactory(argc, argv));
+    PeakInvestigator pp("fetch", debug_level_, factory);
+#else
+    PeakInvestigator pp("fetch", debug_level_, new ConsoleDialogFactory(argc, argv));
+#endif
+
     pp.setLogType(log_type_);
     pp.setParameters(pi_param);
     pp.setUsername(username);
     pp.setProject(project);
-
-#if WITH_GUI
-    if (gui)
-    {
-      pp.setDialogFactory(new GUIDialogFactory());
-    }
-#endif
 
     if (!pp.setExperiment(experiment))
     {
@@ -211,11 +190,6 @@ protected:
   String log;
   String username;
   String project;
-
-#if WITH_GUI
-  bool gui;
-  QApplication* app;
-#endif
 
 };
 
