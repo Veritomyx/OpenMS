@@ -36,10 +36,11 @@
 #define OPENMS_TRANSFORMATIONS_RAW2PEAK_PEAKINVESTIGATOR_DIALOGS_CONSOLEDIALOGFACTORY_H
 
 #include "AbstractDialogFactory.h"
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PEAKINVESTIGATOR/PeakInvestigatorConfig.h>
 
 namespace OpenMS
 {
-  class ConsoleDialogFactory : public AbstractDialogFactory
+  class PEAKINVESTIGATOR_DLLAPI ConsoleDialogFactory : public AbstractDialogFactory
   {
     public:
       ConsoleDialogFactory(int argc, const char** argv);
