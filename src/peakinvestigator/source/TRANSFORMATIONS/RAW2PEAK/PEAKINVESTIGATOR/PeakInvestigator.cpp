@@ -127,9 +127,9 @@ namespace OpenMS
     endProgress();
   }
 
-  bool PeakInvestigator::setExperiment(MSExperiment& experiment)
+  bool PeakInvestigator::setExperiment(MSExperiment& experiment, bool force)
   {
-    bool retval = validateExperiment_(experiment);
+    bool retval = validateExperiment_(experiment, force);
     if (retval)
     {
       experiment_ = experiment;
@@ -138,9 +138,9 @@ namespace OpenMS
     return retval;
   }
 
-  bool PeakInvestigator::setCharacterization(MSExperiment& characterization)
+  bool PeakInvestigator::setCharacterization(MSExperiment& characterization, bool force)
   {
-    bool retval = validateExperiment_(characterization);
+    bool retval = validateExperiment_(characterization, force);
     if (retval)
     {
       characterization_ = characterization;
@@ -565,7 +565,7 @@ namespace OpenMS
 
   }
 
-  bool PeakInvestigator::validateExperiment_(OpenMS::MSExperiment &experiment)
+  bool PeakInvestigator::validateExperiment_(OpenMS::MSExperiment &experiment, bool force)
   {
     if (experiment.empty())
     {
@@ -574,7 +574,7 @@ namespace OpenMS
     }
 
     //check for peak type (profile data required)
-    if (PeakTypeEstimator().estimateType(experiment[0].begin(), experiment[0].end()) == SpectrumSettings::PEAKS)
+    if (!force && PeakTypeEstimator().estimateType(experiment[0].begin(), experiment[0].end()) == SpectrumSettings::PEAKS)
     {
       LOG_ERROR << "OpenMS peak type estimation indicates that this is not profile data!";
       return false;

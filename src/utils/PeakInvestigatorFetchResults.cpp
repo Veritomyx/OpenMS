@@ -147,7 +147,7 @@ protected:
     pp.setUsername(username);
     pp.setProject(project);
 
-    if (!pp.setExperiment(experiment))
+    if (!pp.setExperiment(experiment, false))
     {
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }

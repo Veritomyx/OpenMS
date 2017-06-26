@@ -99,6 +99,8 @@ protected:
     registerStringOption_("username", "<text>", "", "username for PeakInvestigator services", true);
     registerStringOption_("project", "<text>", "", "project for PeakInvestigator services", true);
 
+    registerFlag_("force", "Force submission of data identifed as centroided");
+
 #if WITH_GUI
     registerFlag_("console", "Use the console for dialogs");
 #endif
@@ -153,12 +155,12 @@ protected:
     pp.setUsername(username);
     pp.setProject(project);
 
-    if (!pp.setExperiment(experiment))
+    if (!pp.setExperiment(experiment, getFlag_("force")))
     {
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }
 
-    if (ch != String::EMPTY && !pp.setCharacterization(characterization))
+    if (ch != String::EMPTY && !pp.setCharacterization(characterization, getFlag_("force")))
     {
       return TOPPBase::INCOMPATIBLE_INPUT_DATA;
     }

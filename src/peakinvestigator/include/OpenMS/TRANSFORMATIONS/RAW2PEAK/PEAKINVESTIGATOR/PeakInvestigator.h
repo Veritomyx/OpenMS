@@ -119,7 +119,7 @@ namespace OpenMS
      * contains mass spectra and isn't already centroided).
      * @return Bool indicating whether the experiment has the correct attributes.
      */
-      bool setExperiment(MSExperiment& experiment);
+      bool setExperiment(MSExperiment& experiment, bool force);
 
       /** @brief Set the characterization file for processing
      *
@@ -127,7 +127,7 @@ namespace OpenMS
      * contains mass spectra and isn't already centroided).
      * @return Bool indicating whether the experiment has the correct attributes.
      */
-      bool setCharacterization(MSExperiment& characterization);
+      bool setCharacterization(MSExperiment& characterization, bool force);
 
       /// Get the jobID, which is set after a call to initializeJob_().
       String getJobID() { return job_; }
@@ -179,7 +179,7 @@ namespace OpenMS
       String getPassword_();
       SftpAction getSftpInfo_();
       void deleteJob_();
-      bool validateExperiment_(MSExperiment& experiment);
+      bool validateExperiment_(MSExperiment& experiment, bool force);
 
       ///@}
       //--------------------------------------------------------------------------------------------------------
